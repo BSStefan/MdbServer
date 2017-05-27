@@ -21,11 +21,11 @@ class CreateMoviesTable extends Migration
             $table->string('homepage',255);
             $table->string('description');
             $table->string('language',4);
-            $table->string('tagline',255);
+            $table->string('tag_line',255);
             $table->date('release_day');
             $table->string('image_url',255);
             $table->timestamps();
-            $table->foreign('director_id')->refernces('id')->on('directors');
+            $table->foreign('director_id')->references('id')->on('directors');
         });
     }
 
