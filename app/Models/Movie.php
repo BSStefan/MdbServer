@@ -12,26 +12,26 @@ class Movie extends Model
 
     public function actors()
     {
-        $this->belongsToMany(Actor::class);
+        return $this->belongsToMany(Actor::class);
     }
 
     public function director()
     {
-        $this->belongsTo(Director::class);
+        return $this->belongsTo(Director::class);
     }
 
     public function genres()
     {
-        $this->belongsToMany(Genre::class);
+        return $this->belongsToMany(Genre::class);
     }
 
     public function keywords()
     {
-        $this->belongsToMany(Keyword::class);
+        return $this->belongsToMany(Keyword::class);
     }
 
     public function writers()
     {
-        $this->belongsToMany(Writer::class);
+        return $this->belongsToMany(Writer::class);
     }
 }

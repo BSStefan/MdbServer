@@ -16,7 +16,7 @@ abstract class Repository implements RepositoryInterface
     /**
      * @var Model
      */
-    private $model;
+    protected $model;
 
     protected $modelClass = null;
 
@@ -43,7 +43,7 @@ abstract class Repository implements RepositoryInterface
             );
         }
 
-        $this->model = $model;
+        return $this->model = $model;
     }
 
     /**
@@ -68,7 +68,7 @@ abstract class Repository implements RepositoryInterface
     /**
      * @param array $data
      * @param int $id
-     * @return boolean
+     * @return mixed
      */
     public function save(array $data, $id = 0)
     {
@@ -82,7 +82,11 @@ abstract class Repository implements RepositoryInterface
             $item[$k] = $v;
         }
 
-        return $item->save();
+        if($item->save()) {
+            return $item;
+        }
+
+        return null;
     }
 
     /**

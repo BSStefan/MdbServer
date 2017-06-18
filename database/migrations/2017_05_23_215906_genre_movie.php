@@ -14,9 +14,9 @@ class GenreMovie extends Migration
     public function up()
     {
         Schema::create('genre_movie', function (Blueprint $table) {
-            $table->increments('id');
             $table->integer('genre_id')->unsigned();
             $table->integer('movie_id')->unsigned();
+            $table->primary(['genre_id','movie_id'],'genre_movie');
             $table->foreign('genre_id')->references('id')->on('genres');
             $table->foreign('movie_id')->references('id')->on('movies');
         });

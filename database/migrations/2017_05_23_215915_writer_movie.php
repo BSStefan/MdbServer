@@ -29,6 +29,6 @@ class WriterMovie extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('writer_movie');
+        Schema::dropIfExists('movie_writer');
     }
 }

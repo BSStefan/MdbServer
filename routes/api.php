@@ -1,18 +1,14 @@
 <?php
 
-use Illuminate\Http\Request;
+//Admin
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['prefix' => 'tmdb'], function(){
+    Route::get('popular-people/{page}','Admin\PeopleController@getPopularPeopleFromTmdb')->name('tmdb.popular.people');
+    Route::get('genres','Admin\GenreController@getAllGenresFromTmdb')->name('tmdb.genres');
+    Route::get('popular-movies/{pages}','Admin\MovieController@getTopMoviesFromTmdb')->name('tmdb.popular.movies');
+    Route::get('popular-movie/{id}','Admin\MovieController@getMovieFromTmdb')->name('tmdb.popular.movie');
+    Route::get('now-playing-movies','Admin\MovieController@getNewestFromTmdb')->name('tmdb.now-playing.movies');
+    Route::get('upcoming-movies','Admin\MovieController@getUpcomingFromTmdb')->name('tmdb.upcoming.movies');
+    Route::get('get-images/{page}', 'Admin\StartController@getTopImage');
 });
+

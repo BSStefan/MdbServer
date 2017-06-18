@@ -15,7 +15,7 @@ class CreateGenresTable extends Migration
     {
         Schema::create('genres', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name', 45);
+            $table->string('name', 45)->unique();
             $table->timestamps();
         });
     }
@@ -27,6 +27,7 @@ class CreateGenresTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('genre_movie');
         Schema::dropIfExists('genres');
     }
 }

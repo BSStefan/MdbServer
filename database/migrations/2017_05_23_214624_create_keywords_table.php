@@ -15,7 +15,7 @@ class CreateKeywordsTable extends Migration
     {
         Schema::create('keywords', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('word', 45);
+            $table->string('word', 45)->unique();
             $table->timestamps();
         });
     }
@@ -27,6 +27,7 @@ class CreateKeywordsTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('keyword_movie');
         Schema::dropIfExists('keywords');
     }
 }

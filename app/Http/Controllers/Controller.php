@@ -10,4 +10,12 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    public function saveImageFromUrl($url, $path)
+    {
+        $extension = pathinfo($url,PATHINFO_EXTENSION);
+        $fullName =  $path . '/' . md5(microtime()) . '.' . $extension;
+        //Image::make($url)->save(public_path($fullName));
+        return $fullName;
+    }
 }

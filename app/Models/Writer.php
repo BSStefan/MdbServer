@@ -12,6 +12,6 @@ class Writer extends Model
 
     public function movies()
     {
-        $this->belongsToMany(Movie::class);
+        return $this->belongsToMany(Movie::class);
     }
 }
