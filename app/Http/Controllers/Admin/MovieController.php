@@ -50,16 +50,7 @@ class MovieController extends Controller
 
         $movie = $this->tmdbRepository->getMovie($id);
 
-        $director = $this->directorRepository->findBy('tmdb_id', $movie['crew']['director'][0]);
-        if(!$director) {
-            $director = $this->tmdbRepository->getPerson($movie['crew']['director'][0]);
-            $director['image_url'] = $director['image_url'] ?
-                $this->saveImageFromUrl($director['image_url'], 'images/directors') : 'No image';
-            unset($director['role']);
-            $director = $this->directorRepository->save($director);
-        }
-        $movie['movie']['director_id'] = $director['id'];
-
+        $movie['movie']['director_id'] = $this->checkDirector($movie['crew']['director'][0])->id;
         $movieModel = $this->movieRepository->save($movie['movie']);
 
         foreach ($movie['genres'] as $genre) {
@@ -76,32 +67,71 @@ class MovieController extends Controller
         $movieModel->keywords()->attach($keywords);
 
         foreach ($movie['cast'] as $actor) {
-            $this->actorRepository->findBy('tmdb_id', $actor[0]);
-            if(!$actorModel = $this->actorRepository->findBy('tmdb_id', $actor[0])) {
-                $actorTmdb = $this->tmdbRepository->getPerson($actor[0]);
-                $actorTmdb['image_url'] = $actorTmdb['image_url'] ?
-                    $this->saveImageFromUrl($actorTmdb['image_url'], 'images/directors') : 'No image';
-                unset($actorTmdb['role']);
-                $actorModel = $this->actorRepository->save($actorTmdb);
-            }
+            $actorModel = $this->checkActor($actor[0]);
             array_push($cast, $actorModel->id);
         }
         $movieModel->actors()->attach($cast);
 
         foreach ($movie['crew']['writers'] as $writer) {
-            if(!$writerModel = $this->writerRepository->findBy('tmdb_id', $writer[0])) {
-                $writerTmdb = $this->tmdbRepository->getPerson($writer[0]);
-                $writerTmdb['image_url'] = $writerTmdb['image_url'] ?
-                    $this->saveImageFromUrl($writerTmdb['image_url'], 'images/directors') : 'No image';
-                unset($writerTmdb['role']);
-                $writerModel = $this->writerRepository->save($writerTmdb);
-            }
-            array_push($cast, $writerModel->id);
+            $writerModel = $this->checkWriter($writer[0]);
+            array_push($writers, $writerModel->id);
         }
         $movieModel->writers()->attach($writers);
 
         return response()->json('Movie successfully saved.');
     }
+
+    protected function checkDirector($directorId) {
+        $director = $this->directorRepository->findBy('tmdb_id', $directorId);
+        if(!$director) {
+            $director = $this->tmdbRepository->getPerson($directorId);
+            $director['role'] = 'director';
+            $director = $this->savePersonPerRole($director);
+        }
+        return $director;
+    }
+
+    protected function checkActor($actorId) {
+        $actorModel = $this->actorRepository->findBy('tmdb_id', $actorId);
+        if(!$actorModel) {
+            $actorTmdb = $this->tmdbRepository->getPerson($actorId);
+            $actorTmdb['role'] = 'actor';
+            $actorModel = $this->savePersonPerRole($actorTmdb);
+        }
+        return $actorModel;
+    }
+
+    protected function checkWriter($writerId) {
+        if(!$writerModel = $this->writerRepository->findBy('tmdb_id', $writerId)) {
+            $writerTmdb = $this->tmdbRepository->getPerson($writerId);
+            $writerTmdb['role'] = 'writer';
+            $writerModel = $this->savePersonPerRole($writerTmdb);
+        }
+        return $writerModel;
+    }
+
+    private function savePersonPerRole($person){
+        switch ($person['role']){
+            case 'actor':
+                $person['image_url'] = $person['image_url'] ?
+                    $this->saveImageFromUrl($person['image_url'], 'images/actors') : 'No image';
+                unset($person['role']);
+                return $this->actorRepository->save($person);
+            case 'director':
+                $person['image_url'] = $person['image_url'] ?
+                    $this->saveImageFromUrl($person['image_url'], 'images/directors') : 'No image';
+                unset($person['role']);
+                return $this->directorRepository->save($person);
+            case 'writer':
+                $person['image_url'] = $person['image_url'] ?
+                    $this->saveImageFromUrl($person['image_url'], 'images/writers') : 'No image';
+                unset($person['role']);
+                return $this->writerRepository->save($person);
+            default:
+                return null;
+            }
+        }
+
 
     public function getTopMoviesFromTmdb($page)
     {

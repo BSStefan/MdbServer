@@ -51,25 +51,30 @@ class StartController extends Controller
         $people = $this->tmdbRepository->getPopularPeople($page);
 
         foreach ($people as $person) {
-            switch ($person['role']){
-                case 'actor':
-                    $person['image_url'] = $person['image_url'] ?
-                        $this->saveImageFromUrl($person['image_url'], 'images/actors') : 'No image';
-                        $this->actorRepository->save($person);
-                    break;
-                case 'director':
-                    $person['image_url'] = $person['image_url'] ?
-                        $this->saveImageFromUrl($person['image_url'], 'images/directors') : 'No image';
-                        $this->directorRepository->save($person);
-                    break;
-                case 'writer':
-                    $person['image_url'] = $person['image_url'] ?
-                        $this->saveImageFromUrl($person['image_url'], 'images/writers') : 'No image';
-                        $this->writerRepository->save($person);
-                    break;
-            }
+            $this->savePerson($person);
         }
+
         return response()->json('Actors are successfully saved', 200);
+    }
+
+    protected function savePerson($person) {
+        dd($person); exit;
+        switch ($person['role']){
+            case 'actor':
+                $person['image_url'] = $person['image_url'] ?
+                    $this->saveImageFromUrl($person['image_url'], 'images/actors') : 'No image';
+                return $this->actorRepository->save($person);
+            case 'director':
+                $person['image_url'] = $person['image_url'] ?
+                    $this->saveImageFromUrl($person['image_url'], 'images/directors') : 'No image';
+                return $this->directorRepository->save($person);
+            case 'writer':
+                $person['image_url'] = $person['image_url'] ?
+                    $this->saveImageFromUrl($person['image_url'], 'images/writers') : 'No image';
+                return $this->writerRepository->save($person);
+            default :
+                return null;
+        }
     }
 
     public function getGenres()
@@ -144,6 +149,7 @@ class StartController extends Controller
 
         return response()->json('Movie successfully saved.');
     }
+
 
     public function saveImageFromUrl($url, $path)
     {

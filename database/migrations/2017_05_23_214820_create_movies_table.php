@@ -24,7 +24,7 @@ class CreateMoviesTable extends Migration
             $table->string('language',4);
             $table->string('tag_line',255);
             $table->date('release_day');
-            $table->time('runtime');
+            $table->integer('runtime');
             $table->string('image_url',255);
             $table->timestamps();
             $table->foreign('director_id')->references('id')->on('directors');

@@ -50,14 +50,17 @@ class PeopleController extends Controller
             case 'actor':
                 $person['image_url'] = $person['image_url'] ?
                     $this->saveImageFromUrl($person['image_url'], 'images/actors') : 'No image';
+                unset($person['role']);
                 return $this->actorRepository->save($person);
             case 'director':
                 $person['image_url'] = $person['image_url'] ?
                     $this->saveImageFromUrl($person['image_url'], 'images/directors') : 'No image';
+                unset($person['role']);
                 return $this->directorRepository->save($person);
             case 'writer':
                 $person['image_url'] = $person['image_url'] ?
                     $this->saveImageFromUrl($person['image_url'], 'images/writers') : 'No image';
+                unset($person['role']);
                 return $this->writerRepository->save($person);
             default:
                 return null;
