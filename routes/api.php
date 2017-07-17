@@ -12,3 +12,7 @@ Route::group(['prefix' => 'tmdb'], function(){
     Route::get('get-images/{page}', 'Admin\StartController@getTopImage');
 });
 
+Route::group(['prefix' => 'croler'], function (){
+   Route::get('current-movies', 'Admin\CinemaMovieSearchController@findCurrentMoviesInCinema')->name('croler.curent.movies');
+});
+
