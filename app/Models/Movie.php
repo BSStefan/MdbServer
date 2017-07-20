@@ -34,4 +34,9 @@ class Movie extends Model
     {
         return $this->belongsToMany(Writer::class);
     }
+
+    public function projections()
+    {
+        $this->hasMany(MovieCinema::class);
+    }
 }

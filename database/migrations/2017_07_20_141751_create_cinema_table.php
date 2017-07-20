@@ -19,7 +19,7 @@ class CreateCinemaTable extends Migration
             $table->string('address');
             $table->string('phone');
             $table->text('crawler_link');
-            $table->timestamp('created_at')->nullable();
+            $table->timestamp('created_at');
         });
     }
 

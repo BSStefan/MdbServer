@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class WriterMovie extends Migration
+class CreateMovieCinemasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,14 @@ class WriterMovie extends Migration
      */
     public function up()
     {
-        Schema::create('movie_writer', function (Blueprint $table) {
+        Schema::create('movie_cinemas', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('writer_id')->unsigned();
             $table->integer('movie_id')->unsigned();
-            $table->timestamp('created_at');
-            $table->foreign('writer_id')->references('id')->on('writers');
-            $table->foreign('movie_id')->references('id')->on('movies');
+            $table->integer('cinema_id')->unsigned();
+            $table->string('time');
+            $table->string('room');
+            $table->string('url');
+            $table->timestamps();
         });
     }
 
@@ -30,6 +31,6 @@ class WriterMovie extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('movie_writer');
+        Schema::dropIfExists('movie_cinemas');
     }
 }

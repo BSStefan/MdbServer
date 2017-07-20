@@ -17,6 +17,7 @@ class ActorMovie extends Migration
            $table->increments('id');
             $table->integer('actor_id')->unsigned();
             $table->integer('movie_id')->unsigned();
+            $table->timestamp('created_at');
             $table->foreign('actor_id')->references('id')->on('actors');
             $table->foreign('movie_id')->references('id')->on('movies');
         });

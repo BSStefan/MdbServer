@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Repositories\Admin\CrawlerRepository;
 use App\Repositories\CinemaRepository;
+use Carbon\Carbon;
 
 class CinemaMovieSearchController extends Controller
 {
@@ -30,12 +31,18 @@ class CinemaMovieSearchController extends Controller
 
     public function findTimeCurrentMoviesInCinema()
     {
-        $cinemas = $this->cinemaRepository->all();
+        //$cinemas = $this->cinemaRepository->all();
+        $cinemas = ['http://www.cineplexx.rs/service/program.php?type=program&centerId=616&date=*&sorting=alpha&undefined=Svi&view=detail&page=1'];
         $weekInformation = [];
+
         foreach($cinemas as $cinema) {
-            array_push($weekInformation, $this->crawlerRepository->findTimes($cinema->crawler_link));
+            for($i=0; $i < 7; $i++){
+                $date = Carbon::now()->addDays($i)->toDateString();
+                $url = str_replace('*', $date, $cinema); //TODO changesS
+                array_push($weekInformation, $this->crawlerRepository->findTimes($url));
+            }
         }
 
-
+        return $weekInformation;
     }
 }
