@@ -4,35 +4,38 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Repositories\Admin\CrolerRepository;
+use App\Repositories\Admin\CrawlerRepository;
+use App\Repositories\CinemaRepository;
 
 class CinemaMovieSearchController extends Controller
 {
-    protected $crolerRepository;
+    protected $crawlerRepository;
+    protected $cinemaRepository;
 
-    public function __construct(CrolerRepository $crolerRepository)
+    public function __construct(
+        CrawlerRepository $crawlerRepository,
+        CinemaRepository $cinemaRepository
+    )
     {
-        $this->crolerRepository = $crolerRepository;
+        $this->crawlerRepository = $crawlerRepository;
+        $this->cinemaRepository  = $cinemaRepository;
     }
 
     public function findCurrentMoviesInCinema()
     {
-        $movies = $this->crolerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
+        $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
 
         return $movies;
     }
 
     public function findTimeCurrentMoviesInCinema()
     {
-        //Upisati u bazu
-        $cinemas = [
-            'BIG Beograd'          => 'http://www.cineplexx.rs/service/program.php?type=program&centerId=616&sorting=alpha&undefined=Svi&view=detail&page=1',
-            'Cineplexx Delta City' => 'http://www.cineplexx.rs/service/program.php?type=program&centerId=611&date=2017-07-20&sorting=alpha&undefined=Svi&view=detail&page=1',
-            'Cinaplexx Kragujevac' => 'http://www.cineplexx.rs/service/program.php?type=program&centerId=612&date=2017-07-20&sorting=alpha&undefined=Svi&view=detail&page=1',
-            'Cinaplexx Nis'        => 'http://www.cineplexx.rs/service/program.php?type=program&centerId=615&date=2017-07-20&sorting=alpha&undefined=Svi&view=detail&page=1',
-            'Cinaplexx Usce'       => 'http://www.cineplexx.rs/service/program.php?type=program&centerId=614&date=2017-07-20&sorting=alpha&undefined=Svi&view=detail&page=1'
-        ];
+        $cinemas = $this->cinemaRepository->all();
+        $weekInformation = [];
+        foreach($cinemas as $cinema) {
+            array_push($weekInformation, $this->crawlerRepository->findTimes($cinema->crawler_link));
+        }
 
-        $info = $this->crolerRepository->findTimes($cinemas['BIG Beograd']);
+
     }
 }

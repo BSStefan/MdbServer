@@ -2,13 +2,13 @@
 
 namespace App\Repositories\Admin;
 
-use App\Helpers\Croler;
+use App\Helpers\Crawler;
 
-class CrolerRepository
+class CrawlerRepository
 {
     protected $croler;
 
-    public function __construct(Croler $croler)
+    public function __construct(Crawler $croler)
     {
         $this->croler = $croler;
     }

@@ -3,7 +3,7 @@
 namespace App\Helpers;
 use DOMDocument;
 
-class Croler
+class Crawler
 {
     //Default settings
     private $options = [
