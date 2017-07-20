@@ -5,7 +5,7 @@ use DOMDocument;
 
 class Croler
 {
-
+    //Default settings
     private $options = [
         'http' => [
             'method'  => 'GET',

@@ -55,4 +55,43 @@ class CrolerRepository
         return $titles;
     }
 
+    public function findTimes($url)
+    {
+        $doc = $this->croler->getPageHtml($url);
+        $movies = [];
+        $divs = $doc->getElementsByTagName('div');
+
+        foreach($divs as $div) {
+            $classes = $div->getAttribute('class');
+            if(strpos($classes, 'info') !== false) {
+                $hTag = $div->getElementsByTagName('h2');
+                $movie['title'] = $hTag[0]->nodeValue;
+            }
+            if(strpos($classes, 'start-times') !== false) {
+                $movie = [
+                    'a'    => [],
+                    'time' => [],
+                    'room' => []
+                ];
+                $aTags = $div->getElementsByTagName('a');
+                $pTags = $div->getElementsByTagName('p');
+                foreach($aTags as $a){
+                    array_push($movie['a'], trim($a->getAttribute('href')));
+                }
+                foreach($pTags as $p) {
+                    $class = $p->getAttribute('class');
+                    if(strpos($class, 'time-desc') !== false) {
+                        array_push($movie['time'], trim($p->nodeValue));
+                    }
+                    else if(strpos($class, 'room-desc') !== false) {
+                        array_push($movie['room'], trim($p->nodeValue));
+                    }
+                }
+                array_push($movies, $movie);
+            }
+        }
+        return $movies;
+    }
+
+
 }
