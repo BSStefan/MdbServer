@@ -11,6 +11,7 @@ class Crawler
             'method'  => 'GET',
             'headers' => [
                 'User-Agent: Test/0.1',
+                'Cookie : SID=di8873lee23797g0ttgcd13t93; lbconpers=rd5o00000000000000000000ffffc2e8220eo80; _ga=GA1.2.511727334.1499778335; _gid=GA1.2.969828138.1500542372'
             ]
         ]
     ];

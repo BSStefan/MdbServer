@@ -34,14 +34,19 @@ class CinemaMovieSearchController extends Controller
         //$cinemas = $this->cinemaRepository->all();
         $cinemas = ['http://www.cineplexx.rs/service/program.php?type=program&centerId=616&date=*&sorting=alpha&undefined=Svi&view=detail&page=1'];
         $weekInformation = [];
+        $date = Carbon::now()->addDays(0)->toDateString();
+        $url = str_replace('*', $date, $cinemas[0]); //TODO changesS
 
-        foreach($cinemas as $cinema) {
-            for($i=0; $i < 7; $i++){
-                $date = Carbon::now()->addDays($i)->toDateString();
-                $url = str_replace('*', $date, $cinema); //TODO changesS
-                array_push($weekInformation, $this->crawlerRepository->findTimes($url));
-            }
-        }
+        array_push($weekInformation, $this->crawlerRepository->findTimes($url));
+
+
+        //foreach($cinemas as $cinema) {
+        //    for($i=0; $i < 7; $i++){
+        //        $date = Carbon::now()->addDays($i)->toDateString();
+        //        $url = str_replace('*', $date, $cinema); //TODO changesS
+        //        array_push($weekInformation, $this->crawlerRepository->findTimes($url));
+        //    }
+        //}
 
         return $weekInformation;
     }
