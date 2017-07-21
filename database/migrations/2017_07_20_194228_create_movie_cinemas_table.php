@@ -21,6 +21,8 @@ class CreateMovieCinemasTable extends Migration
             $table->string('room');
             $table->string('url');
             $table->timestamps();
+            $table->foreign('movie_id')->references('id')->on('movies');
+            $table->foreign('cinema_id')->references('id')->on('cinemas');
         });
     }
 
