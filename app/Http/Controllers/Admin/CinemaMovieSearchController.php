@@ -24,7 +24,7 @@ class CinemaMovieSearchController extends Controller
 
     public function findCurrentMoviesInCinema()
     {
-        $movices = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
+        $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
 
         return $movies;
     }
