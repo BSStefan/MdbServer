@@ -13,7 +13,7 @@ Route::group(['prefix' => 'tmdb'], function (){
 });
 
 Route::group(['prefix' => 'croler'], function (){
-    Route::get('current-movies', 'Admin\CinemaMovieSearchController@findCurrentMoviesInCinema')->name('croler.current-movies');
+    Route::get('current-movies', 'Admin\MovieController@findCurrentMoviesInCinema')->name('croler.current-movies');
     Route::get('current-movies-time', 'Admin\CinemaMovieSearchController@findTimeCurrentMoviesInCinema')->name('croler.time-current-movies');
 });
 

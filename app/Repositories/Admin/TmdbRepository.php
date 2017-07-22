@@ -2,8 +2,10 @@
 
 namespace App\Repositories\Admin;
 
+use Carbon\Carbon;
 use Intervention\Image\Facades\Image;
 use Tmdb\Helper\ImageHelper;
+use Tmdb\Model\Search\SearchQuery\MovieSearchQuery;
 use Tmdb\Repository\GenreRepository;
 use Tmdb\Repository\MovieRepository;
 use Tmdb\Repository\PeopleRepository;
@@ -254,6 +256,19 @@ class TmdbRepository
         }
 
         return $newCrew;
+    }
+
+    public function findByName($movie, $year = null)
+    {
+        $options = new MovieSearchQuery();
+        $options->includeAdult(false)->year($year);
+        $movies = $this->searchRepository->searchMovie($movie, $options);
+
+        foreach($movies as $movie){
+            return $movie->getId();
+        }
+
+        return null;
     }
 
 
