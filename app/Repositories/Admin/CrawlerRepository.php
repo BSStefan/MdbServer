@@ -57,42 +57,66 @@ class CrawlerRepository
 
     public function findTimes($url)
     {
-        $doc    = $this->croler->getPageHtml($url);
-        $movies = [];
-        $divs   = $doc->getElementsByTagName('div');
+        $doc     = $this->croler->getPageHtml($url);
+        $movies  = [];
+        $selects = $doc->getElementsByTagName('select');
+        $divs    = $doc->getElementsByTagName('div');
+
+        foreach($selects as $select){
+            $name = $select->getAttribute('name');
+            if($name == 'centerId'){
+                $options = $select->getElementsByTagName('option');
+                foreach($options as $option){
+                    if($option->hasAttribute('selected')){
+                        $cinema = $option->nodeValue;
+                    }
+                }
+            }
+            if($name == 'date'){
+                $options = $select->getElementsByTagName('option');
+                foreach($options as $option){
+                    if($option->hasAttribute('selected')){
+                        $date = $option->getAttribute('value');
+                    }
+                }
+            }
+        }
 
         foreach($divs as $div){
             $classes = $div->getAttribute('class');
             if(strpos($classes, 'overview-element') !== false){
-                $movie     = [];
-                $childDivs = $div->getElementsByTagName('div');
+                $movieTitle = '';
+                $childDivs  = $div->getElementsByTagName('div');
                 foreach($childDivs as $childDiv){
                     $childClasses = $childDiv->getAttribute('class');
                     if(strpos($childClasses, 'starBoxSmall') !== false){
-                        $pTags          = $div->getElementsByTagName('p');
-                        $movie['title'] = $pTags[1]->nodeValue;
+                        $pTags      = $div->getElementsByTagName('p');
+                        $movieTitle = $pTags[1]->nodeValue;
                     }
                     if(strpos($childClasses, 'start-times') !== false){
-                        $movie['a'] = [];
-                        $movie['time'] = [];
-                        $movie['room'] = [];
                         $aTags = $childDiv->getElementsByTagName('a');
-                        $pTags = $childDiv->getElementsByTagName('p');
                         foreach($aTags as $a){
-                            array_push($movie['a'], trim($a->getAttribute('href')));
-                        }
-                        foreach($pTags as $p){
-                            $class = $p->getAttribute('class');
-                            if(strpos($class, 'time-desc') !== false){
-                                array_push($movie['time'], trim($p->nodeValue));
+                            $movieTime      = [
+                                'title'  => $movieTitle,
+                                'cinema' => $cinema,
+                                'date'   => $date
+                            ];
+                            $pTags          = $a->getElementsByTagName('p');
+                            $movieTime['url'] = trim($a->getAttribute('href'));
+                            foreach($pTags as $p){
+                                $class = $p->getAttribute('class');
+                                if(strpos($class, 'time-desc') !== false){
+                                    $movieTime['time'] = trim($p->nodeValue);
+                                }
+                                else if(strpos($class, 'room-desc') !== false){
+                                    $movieTime['room'] = trim($p->nodeValue);
+                                }
                             }
-                            else if(strpos($class, 'room-desc') !== false){
-                                array_push($movie['room'], trim($p->nodeValue));
-                            }
+                            array_push($movies, $movieTime);
                         }
+
                     }
                 }
-                array_push($movies, $movie);
             }
         }
         return $movies;
