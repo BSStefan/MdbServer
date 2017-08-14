@@ -9,9 +9,20 @@ use App\Repositories\Admin\TmdbRepository;
 
 class GenreController extends Controller
 {
-    private $tmdbRepository,
-            $genreRepository;
+    /**
+     * @var TmdbRepository $tmdbRepository
+     */
+    private $tmdbRepository;
 
+    /**
+     * @var GenreRepository $genreRepository
+     */
+    private $genreRepository;
+
+    /**
+     * @param TmdbRepository $tmdbRepository
+     * @param GenreRepository $genreRepository
+     */
     public function __construct(
         TmdbRepository $tmdbRepository,
         GenreRepository $genreRepository
@@ -21,14 +32,15 @@ class GenreController extends Controller
         $this->genreRepository = $genreRepository;
     }
 
+    /**
+     * Save all genres in db
+     */
     public function getAllGenresFromTmdb()
     {
         $list = $this->tmdbRepository->getGenres();
 
-        foreach ($list as $item) {
-            $this->genreRepository->save(['name' => $item]);
-        }
-
-        return response()->json('The genres were successfully saved.', 200);
+        return response()->json([
+            'status'  => $this->genreRepository->saveAllGenres($list),
+        ], 200);
     }
 }

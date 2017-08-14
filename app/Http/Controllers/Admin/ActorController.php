@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Repositories\Admin\ActorRepository;
+use App\Repositories\ActorRepository;
 use App\Repositories\Admin\TmdbRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

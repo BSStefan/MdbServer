@@ -6,16 +6,29 @@ use App\Helpers\Crawler;
 
 class CrawlerRepository
 {
-    protected $croler;
+    /**
+     * @var Crawler
+     */
+    protected $crawler;
 
-    public function __construct(Crawler $croler)
+    /**
+     * @param Crawler $crawler
+     */
+    public function __construct(Crawler $crawler)
     {
-        $this->croler = $croler;
+        $this->$crawler = $crawler;
     }
 
+    /**
+     * Find links for movie separate page
+     * Return array of links
+     *
+     * @param string $url
+     * @return array
+     */
     public function findLinks($url)
     {
-        $doc = $this->croler->getPageHtml($url);
+        $doc = $this->crawler->getPageHtml($url);
 
         $arrayLinks = [];
 
@@ -32,21 +45,27 @@ class CrawlerRepository
         return $arrayLinks;
     }
 
+    /**
+     * Find all titles current in cinema
+     * Return array of titles
+     *
+     * @param string $url
+     * @return array
+     */
     public function findTitles($url)
     {
         $titles = [];
 
         $urls = $this->findLinks($url);
 
-        foreach($urls as $oneUrl)
-        {
-            $doc = $this->croler->getPageHtml($oneUrl);
+        foreach($urls as $oneUrl){
+            $doc    = $this->crawler->getPageHtml($oneUrl);
             $tables = $doc->getElementsByTagName('table');
             foreach($tables as $table){
                 $tr = $table->firstChild;
                 foreach($tr->childNodes as $td){
                     if($td instanceof \DOMElement && $td->nodeValue != 'Originalni naslov:'){
-                        array_push($titles,$td->nodeValue);
+                        array_push($titles, $td->nodeValue);
                     }
                 }
             }
@@ -55,9 +74,16 @@ class CrawlerRepository
         return $titles;
     }
 
+    /**
+     * Find all times for all movies for one day
+     * Return formatted array of all movies for one day
+     *
+     * @param string $url
+     * @return array
+     */
     public function findTimes($url)
     {
-        $doc     = $this->croler->getPageHtml($url);
+        $doc     = $this->crawler->getPageHtml($url);
         $movies  = [];
         $selects = $doc->getElementsByTagName('select');
         $divs    = $doc->getElementsByTagName('div');
@@ -96,12 +122,12 @@ class CrawlerRepository
                     if(strpos($childClasses, 'start-times') !== false){
                         $aTags = $childDiv->getElementsByTagName('a');
                         foreach($aTags as $a){
-                            $movieTime      = [
+                            $movieTime        = [
                                 'title'  => $movieTitle,
                                 'cinema' => $cinema,
                                 'date'   => $date
                             ];
-                            $pTags          = $a->getElementsByTagName('p');
+                            $pTags            = $a->getElementsByTagName('p');
                             $movieTime['url'] = trim($a->getAttribute('href'));
                             foreach($pTags as $p){
                                 $class = $p->getAttribute('class');
@@ -119,6 +145,7 @@ class CrawlerRepository
                 }
             }
         }
+
         return $movies;
     }
 

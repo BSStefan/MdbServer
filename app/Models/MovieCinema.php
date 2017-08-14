@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class MovieCinema extends Model
 {
+    protected $fillable = [
+        'movie_id', 'cinema_id', 'time', 'room', 'url'
+    ];
+
     public function movie()
     {
         $this->belongsTo(Movie::class);

@@ -16,7 +16,7 @@ class GenreMovie extends Migration
         Schema::create('genre_movie', function (Blueprint $table) {
             $table->integer('genre_id')->unsigned();
             $table->integer('movie_id')->unsigned();
-            $table->timestamp('created_at');
+            $table->timestamps();
             $table->primary(['genre_id','movie_id'],'genre_movie');
             $table->foreign('genre_id')->references('id')->on('genres');
             $table->foreign('movie_id')->references('id')->on('movies');

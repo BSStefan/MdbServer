@@ -7,14 +7,36 @@ use App\Repositories\DirectorRepository;
 use App\Repositories\Admin\TmdbRepository;
 use App\Http\Controllers\Controller;
 use App\Repositories\WriterRepository;
+use Psy\Util\Json;
 
 class PeopleController extends Controller
 {
-    private $tmdbRepository,
-            $actorRepository,
-            $directorRepository,
-            $writerRepository;
+    /**
+     * @var TmdbRepository $tmdbRepository
+     */
+    private $tmdbRepository;
 
+    /**
+     * @var ActorRepository $actorRepository
+     */
+    private $actorRepository;
+
+    /**
+     * @var DirectorRepository $directorRepository
+     */
+    private $directorRepository;
+
+    /**
+     * @var WriterRepository $writerRepository
+     */
+    private $writerRepository;
+
+    /**
+     * @param ActorRepository $actorRepository
+     * @param TmdbRepository $tmdbRepository
+     * @param DirectorRepository $directorRepository
+     * @param WriterRepository $writerRepository
+     */
     public function __construct(
         ActorRepository $actorRepository,
         TmdbRepository $tmdbRepository,
@@ -22,29 +44,50 @@ class PeopleController extends Controller
         WriterRepository $writerRepository
     )
     {
-        $this->actorRepository = $actorRepository;
-        $this->tmdbRepository = $tmdbRepository;
+        $this->actorRepository    = $actorRepository;
+        $this->tmdbRepository     = $tmdbRepository;
         $this->directorRepository = $directorRepository;
-        $this->writerRepository = $writerRepository;
+        $this->writerRepository   = $writerRepository;
     }
 
+    /**
+     * @param int $page
+     * @return Json
+     */
     public function getPopularPeopleFromTmdb($page)
     {
+        //TODO image factory problem
         $people = $this->tmdbRepository->getPopularPeople($page);
 
-        foreach ($people as $person) {
+        foreach($people as $person){
             $this->savePersonPerRole($person);
         }
-        return response()->json('Actors are successfully saved', 200);
+
+        return response()->json([
+            'success' => true,
+        ],
+            200);
     }
 
+    /**
+     * @param int $id
+     * @return Json
+     */
     public function getPersonFromTmdb($id)
     {
-        $person = $this->tmdbRepository->getPerson($id);
-        $this->savePersonPerRole($person);
-        return response()->json('Actor are successfully saved', 200);
+        $person   = $this->tmdbRepository->getPerson($id);
+        $response = $this->savePersonPerRole($person) ? true : false;
+
+        return response()->json([
+            'success' => $response,
+        ], 200);
     }
 
+    /**
+     * Function for saving people per role in db
+     * @param array $person
+     * @return mixed
+     */
     private function savePersonPerRole($person){
         switch ($person['role']){
             case 'actor':

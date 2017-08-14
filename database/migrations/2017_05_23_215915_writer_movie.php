@@ -17,7 +17,7 @@ class WriterMovie extends Migration
             $table->increments('id');
             $table->integer('writer_id')->unsigned();
             $table->integer('movie_id')->unsigned();
-            $table->timestamp('created_at');
+            $table->timestamps();
             $table->foreign('writer_id')->references('id')->on('writers');
             $table->foreign('movie_id')->references('id')->on('movies');
         });

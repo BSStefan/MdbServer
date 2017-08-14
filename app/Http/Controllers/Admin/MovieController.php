@@ -17,8 +17,19 @@ use App\Http\Controllers\Controller;
 
 class MovieController extends Controller
 {
+    /**
+     * @var TmdbRepository $tmdbRepository
+     */
     private $tmdbRepository;
+
+    /**
+     *@var MovieRepository $movieRepository
+     */
     private $movieRepository;
+
+    /**
+     * @var DirectorRepository $directorRepository
+     */
     private $directorRepository;
     private $actorRepository;
     private $writerRepository;
