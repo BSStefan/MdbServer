@@ -12,11 +12,11 @@ class MovieCinema extends Model
 
     public function movie()
     {
-        $this->belongsTo(Movie::class);
+        $this->belongsTo(Movie::class)->withTimestamps();
     }
 
     public function cinema()
     {
-        $this->belongsTo(Cinema::class);
+        $this->belongsTo(Cinema::class)->withTimestamps();
     }
 }

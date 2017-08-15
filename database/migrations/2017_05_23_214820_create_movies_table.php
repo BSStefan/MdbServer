@@ -31,6 +31,7 @@ class CreateMoviesTable extends Migration
             $table->foreign('director_id')->references('id')->on('directors');
             $table->index('title');
             $table->index('tmdb_id');
+            $table->index('in_cinema');
         });
     }
 

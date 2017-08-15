@@ -10,6 +10,6 @@ class Cinema extends Model
 
     public function projections()
     {
-        $this->hasMany(MovieCinema::class);
+        $this->hasMany(MovieCinema::class)->withTimestamps();
     }
 }

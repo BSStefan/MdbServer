@@ -14,6 +14,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Tmdb\Client;
+use Tmdb\Repository\SearchRepository;
 
 class MovieController extends Controller
 {
@@ -60,6 +62,15 @@ class MovieController extends Controller
 
     public function getMovieFromTmdb($id)
     {
+        try{
+            $movie = $this->movieRepository->findBy('tmdb_id', $id);
+            return [
+                'movie' => $movie,
+                'success' => false,
+                'message' => 'Movie already exists'
+            ];
+        }
+        catch(ModelNotFoundException $e){}
         $genres   = [];
         $keywords = [];
         $cast     = [];
@@ -68,6 +79,7 @@ class MovieController extends Controller
         $movie = $this->tmdbRepository->getMovie($id);
 
         $movie['movie']['director_id'] = $this->checkDirector($movie['crew']['director'][0])->id;
+        $movie['movie']['image_url']   = $this->saveImageFromUrl($movie['movie']['image_url'], 'images/movies');
         $movieModel                    = $this->movieRepository->save($movie['movie']);
 
         foreach($movie['genres'] as $genre){
@@ -76,7 +88,13 @@ class MovieController extends Controller
         $movieModel->genres()->attach($genres);
 
         foreach($movie['keywords'] as $word){
-            if(!$wordModel = $this->keywordRepository->findBy('word', $word)){
+            try{
+                $wordModel = $this->keywordRepository->findBy('word', $word);
+            }
+            catch(ModelNotFoundException $e){
+                $wordModel = null;
+            }
+            if(!$wordModel){
                 $wordModel = $this->keywordRepository->save(['word' => $word]);
             }
             array_push($keywords, $wordModel->id);
@@ -95,12 +113,21 @@ class MovieController extends Controller
         }
         $movieModel->writers()->attach($writers);
 
-        return response()->json('Movie successfully saved.');
+        return [
+            'movie' => $movie,
+            'success' => true,
+            'message' => 'Movie successfully saved'
+        ];
     }
 
     protected function checkDirector($directorId)
     {
-        $director = $this->directorRepository->findBy('tmdb_id', $directorId);
+        try{
+            $director = $this->directorRepository->findBy('tmdb_id', $directorId);
+        }
+        catch(ModelNotFoundException $e){
+            $director = null;
+        }
         if(!$director){
             $director         = $this->tmdbRepository->getPerson($directorId);
             $director['role'] = 'director';
@@ -112,25 +139,36 @@ class MovieController extends Controller
 
     protected function checkActor($actorId)
     {
-        $actorModel = $this->actorRepository->findBy('tmdb_id', $actorId);
-        if(!$actorModel){
-            $actorTmdb         = $this->tmdbRepository->getPerson($actorId);
-            $actorTmdb['role'] = 'actor';
-            $actorModel        = $this->savePersonPerRole($actorTmdb);
+        try{
+            $actor = $this->actorRepository->findBy('tmdb_id', $actorId);
+        }
+        catch(ModelNotFoundException $e){
+            $actor = null;
+        }
+        if(!$actor){
+            $actor         = $this->tmdbRepository->getPerson($actorId);
+            $actor['role'] = 'actor';
+            $actor         = $this->savePersonPerRole($actor);
         }
 
-        return $actorModel;
+        return $actor;
     }
 
     protected function checkWriter($writerId)
     {
-        if(!$writerModel = $this->writerRepository->findBy('tmdb_id', $writerId)){
-            $writerTmdb         = $this->tmdbRepository->getPerson($writerId);
-            $writerTmdb['role'] = 'writer';
-            $writerModel        = $this->savePersonPerRole($writerTmdb);
+        try{
+            $writer = $this->writerRepository->findBy('tmdb_id', $writerId);
+        }
+        catch(ModelNotFoundException $e){
+            $writer = null;
+        }
+        if(!$writer){
+            $writer         = $this->tmdbRepository->getPerson($writerId);
+            $writer['role'] = 'writer';
+            $writer         = $this->savePersonPerRole($writer);
         }
 
-        return $writerModel;
+        return $writer;
     }
 
     private function savePersonPerRole($person)
@@ -161,21 +199,46 @@ class MovieController extends Controller
 
     public function getTopMoviesFromTmdb($page)
     {
-        return $this->tmdbRepository->getTopRatedMovies($page);
+        return $this->tmdbRepository->getPopularMovies($page);
     }
 
-    public function getNewestFromTmdb()
+    public function saveTopMoviesFromTmdb($page)
     {
-        return $this->tmdbRepository->getNowPlayingMovies();
+        $popularMovies = $this->tmdbRepository->getPopularMovies($page);
+        $response = [];
+        foreach($popularMovies as $movie) {
+            array_push($response, $this->getMovieFromTmdb($movie['movie']['tmdb_id']));
+        }
+
+        return $response;
     }
 
-    public function getUpcomingFromTmdb()
+    public function getNewestFromTmdb($page)
     {
-        return $this->tmdbRepository->getUpcomingMovies();
+        $newMovies = $this->tmdbRepository->getNowPlayingMovies($page);
+        $response  = [];
+        foreach($newMovies as $movie){
+            array_push($response, $this->getMovieFromTmdb($movie['movie']['tmdb_id']));
+        }
+
+        return $response;
     }
 
-    public function findCurrentMoviesInCinema()
+    public function getUpcomingFromTmdb($page)
     {
+        $upcomingMovies = $this->tmdbRepository->getUpcomingMovies($page);
+        $response       = [];
+        foreach($upcomingMovies as $movie){
+            array_push($response, $this->getMovieFromTmdb($movie['movie']['tmdb_id']));
+        }
+
+        return $response;
+    }
+
+    public function findCurrentMoviesInCinema(SearchRepository $searchRepository)
+    {
+        $this->movieRepository->restartCurrentInCinema();
+
         $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
 
         foreach($movies as $movie) {
@@ -183,10 +246,11 @@ class MovieController extends Controller
                 $movieModel = $this->movieRepository->findBy('title', $movie);
             }
             catch(ModelNotFoundException $e){
-                $id = $this->tmdbRepository->findByName($movie, Carbon::today()->year);
-                $movieModel = $this->getMovieFromTmdb($id);
+                $id = $this->tmdbRepository->findByName($movie, Carbon::today()->year, $searchRepository);
+                $movieModel = $this->getMovieFromTmdb($id)['movie'];
             }
             $movieModel->in_cinema = true;
+
             $this->movieRepository->save($movieModel->getAttributes(), $movieModel->id);
         }
     }

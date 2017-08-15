@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Movie;
 use App\Repositories\Eloquent\Repository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class MovieRepository extends Repository
 {
@@ -20,4 +21,14 @@ class MovieRepository extends Repository
 
         return $moviesTitleIdArray;
     }
+
+    public function restartCurrentInCinema()
+    {
+        $currentInCinema = $this->findWhere('in_cinema', true);
+        foreach($currentInCinema as $movie) {
+            $this->save(['in_cinema' => false], $movie->id);
+        }
+
+    }
+
 }

@@ -118,4 +118,9 @@ abstract class Repository implements RepositoryInterface
     {
         return $this->find($id)->delete();
     }
+
+    public function findWhere($field, $value, $columns = ['*'])
+    {
+        return $this->model->where($field, '=', $value)->get($columns);
+    }
 }

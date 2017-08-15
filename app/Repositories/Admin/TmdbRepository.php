@@ -111,7 +111,7 @@ class TmdbRepository
         $details['tmdb_id']        = $person->getId();
         $details['biography']      = trim(str_replace("\n", "", $person->getBiography()));
         $details['role']           = $this->findRole($details['biography']);
-        $details['birthday']       = date_format($person->getBirthday(), "Y/m/d");
+        $details['birthday']       = $person->getBirthday() ? date_format($person->getBirthday(), "Y/m/d") : null; 
         $details['dead_day']       = $person->getDeathday() ? date_format($person->getDeathday(), "Y/m/d") : null;
         $details['place_of_birth'] = $person->getPlaceOfBirth();
         $details['gender']         = $person->isMale() ? 'male' : 'female';
@@ -161,10 +161,10 @@ class TmdbRepository
      *
      * @return array
      */
-    public function getNowPlayingMovies()
+    public function getNowPlayingMovies($page)
     {
         $movies    = [];
-        $newMovies = $this->movieRepository->getNowPlaying();
+        $newMovies = $this->movieRepository->getNowPlaying(['page' => $page]);
         foreach($newMovies as $movie){
             array_push($movies, $this->formatMovie($movie));
         }
@@ -178,10 +178,10 @@ class TmdbRepository
      *
      * @return array
      */
-    public function getUpcomingMovies()
+    public function getUpcomingMovies($page)
     {
         $movies    = [];
-        $newMovies = $this->movieRepository->getUpcoming();
+        $newMovies = $this->movieRepository->getUpcoming(['page' => $page]);
         foreach($newMovies as $movie){
             array_push($movies, $this->formatMovie($movie));
         }

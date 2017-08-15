@@ -16,7 +16,7 @@ class CrawlerRepository
      */
     public function __construct(Crawler $crawler)
     {
-        $this->$crawler = $crawler;
+        $this->crawler = $crawler;
     }
 
     /**

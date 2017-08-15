@@ -19,7 +19,7 @@ class CreateWritersTable extends Migration
             $table->string('name', 255);
             $table->string('place_of_birth', 255)->nullable();
             $table->string('biography',10000);
-            $table->date('birthday');
+            $table->date('birthday')->nullable();
             $table->date('dead_day')->nullable();
             $table->enum('gender',['male','female'])->default('male');
             $table->string('image_url',255);
