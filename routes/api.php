@@ -17,7 +17,12 @@ Route::group(['prefix' => 'admin'], function (){
         Route::get('current-movies-time', 'Admin\CinemaMovieSearchController@findTimeCurrentMoviesInCinema')->name('admin.crawler.time-current-movies');
     });
 });
-
+Route::group(['prefix' => 'auth'], function (){
+    Route::get('{provider}/login', 'User\AuthController@redirectToProvider');
+    Route::get('{provider}/callback', 'User\AuthController@handleProviderCallback');
+    Route::group(['prefix' => 'mdb'], function (){
+    });
+});
 
 
 

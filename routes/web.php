@@ -17,9 +17,3 @@ Route::get('/', function () {
 
 Route::get('/get-images/{page}', 'StartController@getTopImage');
 
-Route::group(['prefix' => 'auth'], function (){
-    Route::get('{provider}/login', 'User\AuthController@redirectToProvider');
-    Route::get('{provider}/callback', 'User\AuthController@handleProviderCallback');
-    Route::group(['prefix' => 'mdb'], function (){
-    });
-});

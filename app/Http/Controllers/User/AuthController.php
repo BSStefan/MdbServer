@@ -32,7 +32,8 @@ class AuthController extends Controller
      */
     public function redirectToProvider($provider)
     {
-        return Socialite::driver($provider)->redirect();
+        var_dump(Socialite::driver($provider)->stateless()->redirect()->getTargetUrl());exit;
+        return Socialite::driver($provider)->stateless()->getAuthUrl();
     }
 
     /**
@@ -42,8 +43,7 @@ class AuthController extends Controller
      */
     public function handleProviderCallback($provider)
     {
-        $socialUser = Socialite::driver($provider)->user();
-        list($name, $lastname) = explode(' ', $user->name);
+        $socialUser = Socialite::driver($provider)->stateless()->user();
         try{
             $user = $this->userRepository->findBy('email', $socialUser->email);
         }
@@ -51,17 +51,17 @@ class AuthController extends Controller
             $user = null;
         }
         if(!$user){
-            $this->userRepository->save([
-                'email' => $user->email,
-
+            list($name, $lastname) = explode(' ', $socialUser->name);
+            $user = $this->userRepository->save([
+                'email'      => $socialUser->email,
+                'first_name' => $name,
+                'last_name'  => $lastname,
+                'gender'     => $socialUser->user['gender']
             ]);
         }
-        var_dump($user->email);
-        var_dump($user->id);
-        var_dump($user->user['gender']);
-        list($name, $lastname) = explode(' ', $user->name);
-        var_dump($name);
-        var_dump($lastname);
+        if($user) {
+            //kreiraj mu token
+        }
     }
 
 }
