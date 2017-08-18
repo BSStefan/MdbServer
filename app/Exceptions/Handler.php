@@ -47,7 +47,7 @@ class Handler extends ExceptionHandler
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
-    {   var_dump($exception->getMessage(), $exception->getTraceAsString()); exit;
+    {   //var_dump($exception->getMessage(), $exception->getTraceAsString()); exit;
         switch($exception){
             case ($exception instanceof ValidExcaption):
                 return response()->json(new JsonResponse('', $exception->getMessage(), 400), 400);

@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Response\JsonResponse;
 use App\Repositories\GenreRepository;
 use App\Repositories\Admin\TmdbRepository;
 
@@ -39,8 +40,8 @@ class GenreController extends Controller
     {
         $list = $this->tmdbRepository->getGenres();
 
-        return response()->json([
+        return response()->json(new JsonResponse([
             'status'  => $this->genreRepository->saveAllGenres($list),
-        ], 200);
+        ]), 200);
     }
 }

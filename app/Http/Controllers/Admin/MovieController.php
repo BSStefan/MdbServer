@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Response\JsonResponse;
 use App\Repositories\ActorRepository;
 use App\Repositories\Admin\CrawlerRepository;
 use App\Repositories\Admin\TmdbRepository;
@@ -64,11 +65,10 @@ class MovieController extends Controller
     {
         try{
             $movie = $this->movieRepository->findBy('tmdb_id', $id);
-            return [
+            return response()->json(new JsonResponse([
                 'movie' => $movie,
-                'success' => false,
-                'message' => 'Movie already exists'
-            ];
+                'success' => false
+            ],'Movie already exists',400),400);
         }
         catch(ModelNotFoundException $e){}
         $genres   = [];
@@ -113,11 +113,10 @@ class MovieController extends Controller
         }
         $movieModel->writers()->attach($writers);
 
-        return [
+        return response()->json(new JsonResponse([
             'movie' => $movie,
-            'success' => true,
-            'message' => 'Movie successfully saved'
-        ];
+            'success' => true
+        ], 'Movie successfully saved', 200));
     }
 
     protected function checkDirector($directorId)
