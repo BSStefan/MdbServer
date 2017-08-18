@@ -10,7 +10,8 @@
         "laravel/framework": "5.4.*",
         "laravel/socialite": "^3.0",
         "laravel/tinker": "~1.0",
-        "php-tmdb/laravel": "~1.0"
+        "php-tmdb/laravel": "~1.0",
+        "tymon/jwt-auth": "1.0.0-beta.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

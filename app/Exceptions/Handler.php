@@ -2,9 +2,13 @@
 
 namespace App\Exceptions;
 
+use Dotenv\Exception\ValidationException;
+use Illuminate\Validation\ValidationException as ValidExcaption;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use App\Http\Response\JsonResponse;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class Handler extends ExceptionHandler
 {
@@ -43,8 +47,20 @@ class Handler extends ExceptionHandler
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
-    {
-        return parent::render($request, $exception);
+    {   var_dump($exception->getMessage(), $exception->getTraceAsString()); exit;
+        switch($exception){
+            case ($exception instanceof ValidExcaption):
+                return response()->json(new JsonResponse('', $exception->getMessage(), 400), 400);
+            break;
+            case ($exception instanceof JWTException):
+                return response()->json(new JsonResponse('', $exception->getMessage(), 401), 401);
+            break;
+            case ($exception instanceof \Exception):
+                return response()->json(new JsonResponse('', $exception->getMessage(), $exception->getCode()), $exception->getCode());
+            break;
+            default:
+                return response()->json(new JsonResponse('', 'There was an error, try again later', 500), 500);
+        }
     }
 
     /**

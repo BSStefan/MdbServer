@@ -21,6 +21,8 @@ Route::group(['prefix' => 'auth'], function (){
     Route::get('{provider}/login', 'User\AuthController@redirectToProvider');
     Route::get('{provider}/callback', 'User\AuthController@handleProviderCallback');
     Route::group(['prefix' => 'mdb'], function (){
+        Route::post('login', 'User\AuthController@loginUser')->name('auth.mdb.login');
+        Route::post('register', 'User\AuthController@registerUser')->name('auth.mdb.register');
     });
 });
 
