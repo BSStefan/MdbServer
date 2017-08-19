@@ -30,7 +30,7 @@ return [
     ],
 
     'stripe' => [
-        'model' => App\User::class,
+        'model' => App\Models\User::class,
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
@@ -38,7 +38,7 @@ return [
     'facebook' => [
         'client_id' => '123942261577914',
         'client_secret' => '5857431529011c7c6a9ff38b0eaf55ce',
-        'redirect' => 'http://localhost:8005/api/auth/facebook/callback',
+        'redirect' => 'http://mdb.dev/api/auth/facebook/callback',
     ],
     //
     //'twitter' => [

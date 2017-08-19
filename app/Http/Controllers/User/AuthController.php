@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Http\Requests\AuthMdbLoginRequest;
 use App\Http\Response\JsonResponse;
 use App\Repositories\UserProviderRepository;
 use App\Repositories\UserRepository;
@@ -10,6 +9,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
@@ -57,50 +57,67 @@ class AuthController extends Controller
     }
 
     /**
-     * Obtain the user information from GitHub.
+     * Obtain the user information from Facebook.
      *
      * @return JsonResponse
      */
-    public function handleProviderCallback($provider)
+    public function handleProviderCallback($providerName)
     {
-        $socialUser = Socialite::driver($provider)->stateless()->user();
+        $socialUser = Socialite::driver($providerName)->stateless()->user();
         try{
             $provider = $this->userProviderRepository->findBy('provider_id', $socialUser->id);
-            $user = $this->userRepository->find($provider->user_id);
+            $user     = $this->userRepository->find($provider->user_id);
         }
         catch(ModelNotFoundException $exception){
             $provider = null;
-            $user = null;
+            $user     = null;
         }
         if(!$user){
             list($name, $lastname) = explode(' ', $socialUser->name);
-            $user = $this->userRepository->save([
+            try{
+                $emailUser = $this->userRepository->findBy('email', $socialUser->email);
+                $token = $this->jwt->fromUser($emailUser);
+
+                return response()->json(new JsonResponse(['success' => true, 'token' => $token]));
+            }
+            catch(ModelNotFoundException $e){}
+            $user     = $this->userRepository->save([
                 'email'      => $socialUser->email,
                 'first_name' => $name,
                 'last_name'  => $lastname,
                 'gender'     => $socialUser->user['gender']
             ]);
             $provider = $this->userProviderRepository->save([
-                'user_id' => $user->id,
-                'provider' => $provider,
+                'user_id'     => $user->id,
+                'provider'    => $providerName,
                 'provider_id' => $socialUser->id
             ]);
         }
-        if($user) {
+        if($user){
             $token = $this->jwt->fromUser($user);
-            return response()->json(new JsonResponse(['token' => $token]));
+
+            return response()->json(new JsonResponse(['success' => true, 'token' => $token]));
         }
+
+        return response()->json(new JsonResponse(['success' => false, 'token' => null]));
     }
 
+    /**
+     * Login user from credential
+     *
+     * @param Request $request
+     * @param Manager $manager
+     *
+     * @return JsonResponse
+     */
     public function loginUser(Request $request, Manager $manager)
     {
         $this->validate($request, [
-            'email'      => 'required|email',
-            'password'   => 'required|min:6|max:255'
+            'email'    => 'required|email',
+            'password' => 'required|min:6|max:255'
         ]);
         try{
-            if(!$token = $this->jwt->attempt($request->only('email', 'password')))
-            {
+            if(!$token = $this->jwt->attempt($request->only('email', 'password'))){
                 return response()->json(new JsonResponse([
                     'success' => false, 'token' => null
                 ], 'Bad credentials', 403), 403);
@@ -121,14 +138,22 @@ class AuthController extends Controller
         ]));
     }
 
+    /**
+     * Register user
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
     public function registerUser(Request $request)
     {
         $this->validate($request, [
-            'email'      => 'required|email',
+            'email'      => 'required|email|unique:users',
             'first_name' => 'required|min:2|max:50',
             'last_name'  => 'required|min:2|max:50',
             'gender'     => 'required',
-            'password'   => 'required|min:6|max:255'
+            'password'   => 'required|min:6|max:255',
+            'birthday'   => 'nullable|date',
+            'city'       => 'nullable|string'
         ]);
 
         $user = $this->userRepository->save([
@@ -137,15 +162,68 @@ class AuthController extends Controller
             'last_name'  => $request->last_name,
             'gender'     => $request->gender,
             'birthday'   => $request->birthday,
-            'password'   => $request->password
+            'password'   => $request->password,
+            'city'       => $request->city
         ]);
         if($user){
             $token = $this->jwt->fromUser($user);
+
             return response()->json(new JsonResponse(['success' => true, 'token' => $token]));
         }
         else{
             return response()->json(new JsonResponse(['success' => true, 'token' => null]));
         }
+    }
+
+    /**
+     * Check if email exists
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function checkEmailExists(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'email'
+        ]);
+
+        try{
+            $user = $this->userRepository->findBy('email', $request->email);
+        }
+        catch(ModelNotFoundException $e){
+            $user = null;
+        }
+
+        if($user){
+            return response()->json(new JsonResponse(
+                ['success' => false],
+                'User already exists',
+                200
+            ));
+        }
+
+        return response()->json(new JsonResponse(
+            ['success' => true],
+            '',
+            200
+        ));
+    }
+
+    /**
+     * Logout User
+     *
+     * @return JsonResponse
+     */
+    public function logoutUser()
+    {
+        if($this->jwt->manager()->invalidate($this->jwt->getToken())){
+            return response()->json(new JsonResponse([
+                'success' => true
+            ]));
+        }
+        return response()->json(new JsonResponse([
+            'success' => false
+        ], '',400),400);
     }
 
 }

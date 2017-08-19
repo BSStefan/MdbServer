@@ -1,0 +1,77 @@
+REGISTER USER
+POST /api/auth/mdb/register
+    SEND:
+    {
+       "email" : "",
+       "first_name" : "",
+       "last_name" : "",
+       "gender" : "",
+       "password" : "",
+       "birthday" : "",
+       "city" : ""
+    }
+    RESPONSE:
+    {
+        "data" :
+        {
+            "success" : ""
+            "token" : ""
+        },
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------
+
+LOGIN USER
+POST /api/auth/mdb/login
+    SEND:
+    {
+       "email" : "",
+       "password" : ""
+    }
+    RESPONSE:
+    {
+        "data" :
+        {
+            "success" : ""
+            "token" : ""
+        },
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------
+
+CHECK EMAIL EXISTS
+POST /api/auth/mdb/check-email
+    SEND:
+    {
+       "email" : ""
+    }
+    RESPONSE:
+    {
+        "data" :
+        {
+            "success" : ""
+        },
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------
+
+LOGOUT USER
+GET /api/auth/mdb/logout
+    HEADER: AUTHENTICATION : TOKEN
+    RESPONSE:
+    {
+        "data" :
+        {
+            "success" : ""
+        },
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------

@@ -23,8 +23,11 @@ Route::group(['prefix' => 'auth'], function (){
     Route::group(['prefix' => 'mdb'], function (){
         Route::post('login', 'User\AuthController@loginUser')->name('auth.mdb.login');
         Route::post('register', 'User\AuthController@registerUser')->name('auth.mdb.register');
+        Route::post('check-email', 'User\AuthController@checkEmailExists')->name('auth.mdb.check-email');
+        Route::get('logout', ['uses'=> 'User\AuthController@logoutUser', 'middleware' => 'auth.api'])->name('auth.mdb.logout');
     });
 });
+
 
 
 
