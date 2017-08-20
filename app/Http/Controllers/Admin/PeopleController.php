@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Response\JsonResponse;
 use App\Repositories\ActorRepository;
 use App\Repositories\DirectorRepository;
 use App\Repositories\Admin\TmdbRepository;
@@ -52,35 +53,41 @@ class PeopleController extends Controller
 
     /**
      * @param int $page
-     * @return Json
+     * @return JsonResponse
      */
-    public function getPopularPeopleFromTmdb($page)
+    public function postPopularPeopleFromTmdb($page)
     {
         //TODO image factory problem
         $people = $this->tmdbRepository->getPopularPeople($page);
 
-        foreach($people as $person){
-            $this->savePersonPerRole($person);
+        try{
+            foreach($people as $person){
+                $this->savePersonPerRole($person);
+            }
+        }
+        catch(\Exception $e){
+            return response()->json(new JsonResponse([
+                'success' => false,
+            ], 'There was some error, try again', 500));
         }
 
-        return response()->json([
+        return response()->json(new JsonResponse([
             'success' => true,
-        ],
-            200);
+        ]));
     }
 
     /**
      * @param int $id
-     * @return Json
+     * @return JsonResponse
      */
     public function getPersonFromTmdb($id)
     {
         $person   = $this->tmdbRepository->getPerson($id);
         $response = $this->savePersonPerRole($person) ? true : false;
 
-        return response()->json([
+        return response()->json(new JsonResponse([
             'success' => $response,
-        ], 200);
+        ]));
     }
 
     /**

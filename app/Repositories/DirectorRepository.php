@@ -8,5 +8,4 @@ use App\Repositories\Eloquent\Repository;
 class DirectorRepository extends Repository
 {
     protected $modelClass = Director::class;
-
 }

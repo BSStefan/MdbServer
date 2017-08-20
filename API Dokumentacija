@@ -75,3 +75,88 @@ GET /api/auth/mdb/logout
         "code" : ""
     }
 ----------------------------
+
+********************************************************
+
+SAVE ALL GENRES
+POST /api/admin/tmdb/genres
+    HEADER: AUTHENTICATION : TOKEN - ADMIN// !!
+    RESPONSE:
+    {
+        "data" :
+        {
+            "success" : ""
+        },
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------
+
+SAVE ONE MOVIE
+POST /api/admin/tmdb/movie/{id}
+    HEADER: AUTHENTICATION : TOKEN - ADMIN\\ !!
+    RESPONSE:
+    {
+        "data" :
+        {
+            "success" : "",
+            "movie" : ""
+        },
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------
+
+GET POPULAR MOVIES / GET UPCOMING MOVIES / GET NEW MOVIES
+GET /api/admin/tmdb/popular-movies/{id} / /api/admin/tmdb/upcoming-movies/{id} / /api/admin/tmdb/new-movies/{id}
+    HEADER: AUTHENTICATION : TOKEN - ADMIN// !!
+    RESPONSE:
+    {
+        "data" :
+        [
+            {
+                "movie":
+                {
+                    "tmdb_id" : "",
+                    "homepage" : null,
+                    "title" : "",
+                    "language" : "",
+                    "release_day": "",
+                    "runtime" : null,
+                    "tag_line" : null,
+                    "budget" : null,
+                    "description" : "",
+                    "image_url" : ""
+                }
+                "genres": []
+                "keywords": []
+                "cast": []
+                "crew":
+                {
+                    "director" : null,
+                    "writers" : {}
+                }
+            },
+        ]
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------
+
+SAVE POPULAR MOVIES / SAVE NEW MOVIES / SAVE UPCOMING MOVIES
+POST /api/admin/tmdb/popular-movies/{id}
+    HEADER: AUTHENTICATION : TOKEN - ADMIN\\ !!
+    RESPONSE:
+    {
+        "data" :
+        {
+            "title" : ""
+        },
+        "message" : "",
+        "error" : "",
+        "code" : ""
+    }
+----------------------------

@@ -35,13 +35,15 @@ class GenreController extends Controller
 
     /**
      * Save all genres in db
+     *
+     * @return JsonResponse
      */
     public function getAllGenresFromTmdb()
     {
         $list = $this->tmdbRepository->getGenres();
 
         return response()->json(new JsonResponse([
-            'status'  => $this->genreRepository->saveAllGenres($list),
+            'success'  => $this->genreRepository->saveAllGenres($list),
         ]), 200);
     }
 }

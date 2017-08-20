@@ -3,12 +3,14 @@
 //Admin
 Route::group(['prefix' => 'admin'], function (){
     Route::group(['prefix' => 'tmdb'], function (){
-        Route::get('popular-people/{page}', 'Admin\PeopleController@getPopularPeopleFromTmdb')->name('admin.tmdb.popular-people');
-        Route::get('genres', 'Admin\GenreController@getAllGenresFromTmdb')->name('admin.tmdb.genres');
+        Route::post('popular-people/{page}', 'Admin\PeopleController@postPopularPeopleFromTmdb')->name('admin.tmdb.popular-people');
+        Route::post('genres', 'Admin\GenreController@getAllGenresFromTmdb')->name('admin.tmdb.genres');
         Route::get('popular-movies/{page}', 'Admin\MovieController@getTopMoviesFromTmdb')->name('admin.tmdb.popular-movies');
-        Route::post('popular-movies/{page}', 'Admin\MovieController@saveTopMoviesFromTmdb')->name('admin.tmdb.popular-movies');
-        Route::get('movie/{id}', 'Admin\MovieController@getMovieFromTmdb')->name('admin.tmdb.popular-movie');
+        Route::post('popular-movies/{page}', 'Admin\MovieController@postTopMoviesFromTmdb')->name('admin.tmdb.popular-movies');
+        Route::post('movie/{id}', 'Admin\MovieController@postMovieFromTmdb')->name('admin.tmdb.popular-movie');
+        Route::post('now-playing-movies/{page}', 'Admin\MovieController@postNewestFromTmdb')->name('admin.tmdb.now-playing-movies');
         Route::get('now-playing-movies/{page}', 'Admin\MovieController@getNewestFromTmdb')->name('admin.tmdb.now-playing-movies');
+        Route::post('upcoming-movies/{page}', 'Admin\MovieController@postUpcomingFromTmdb')->name('admin.tmdb.upcoming-movies');
         Route::get('upcoming-movies/{page}', 'Admin\MovieController@getUpcomingFromTmdb')->name('admin.tmdb.upcoming-movies');
         Route::get('get-images/{page}', 'Admin\StartController@getTopImage');
     });
