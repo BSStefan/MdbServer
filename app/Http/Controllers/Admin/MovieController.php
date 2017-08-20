@@ -94,6 +94,39 @@ class MovieController extends Controller
     }
 
     /**
+     * Save multiple movie from tmdb ids
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function postMultipleMoviesFromTmdb(Request $request)
+    {
+        $response = [];
+
+        foreach($request->input('ids') as $id){
+            try{
+                $movieModel = $this->movieRepository->findBy('tmdb_id', $id);
+                $response[$movieModel->title] = 'Already exists';
+            }
+            catch(ModelNotFoundException $e){
+                $movieModel = null;
+            }
+            if(!$movieModel){
+                $movie = $this->tmdbRepository->getMovie($id);
+                if($movieModel = $this->saveMovieFromTmdb($movie)){
+                    $response[$movieModel->title] = true;
+                }
+                else{
+                    $response[$movieModel->title] = false;
+                }
+            }
+        }
+
+        return response()->json(new JsonResponse($response));
+    }
+
+    /**
      * Get popular movie from tmdb and show them
      *
      * @param int $page
@@ -177,24 +210,49 @@ class MovieController extends Controller
         return response()->json(new JsonResponse($response));
     }
 
+    /**
+     * Find current movie in cinema and save them
+     *
+     * @param \Tmdb\Repository\SearchRepository  $searchRepository
+     *
+     * @return JsonResponse
+     */
     public function findCurrentMoviesInCinema(SearchRepository $searchRepository)
     {
         $this->movieRepository->restartCurrentInCinema();
 
         $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
-
+        $response = [];
         foreach($movies as $movie) {
             try{
-                $movieModel = $this->movieRepository->findBy('title', $movie);
+                $movieModel = $this->movieRepository->findBy('original_title', $movie);
             }
             catch(ModelNotFoundException $e){
+                $movieModel = null;
+            }
+            if(!$movieModel){
                 $id = $this->tmdbRepository->findByName($movie, Carbon::today()->year, $searchRepository);
-                $movieModel = $this->getMovieFromTmdb($id)['movie'];
+                $movieTmdb = $this->tmdbRepository->getMovie($id);
+                try{
+                    $movieModel = $this->movieRepository->findBy('tmdb_id', $id);
+                }
+                catch(ModelNotFoundException $e){
+                    $movieModel = $this->saveMovieFromTmdb($movieTmdb);
+                }
             }
             $movieModel->in_cinema = true;
 
-            $this->movieRepository->save($movieModel->getAttributes(), $movieModel->id);
+            $movieModel = $this->movieRepository->save($movieModel->getAttributes(), $movieModel->id);
+
+            if($movieModel){
+                $response[$movie] = true;
+            }
+            else{
+                $response[$movie] = false;
+            }
         }
+
+        return response()->json(new JsonResponse($response));
     }
 
     /**

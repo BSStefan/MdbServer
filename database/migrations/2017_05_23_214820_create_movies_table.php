@@ -15,9 +15,10 @@ class CreateMoviesTable extends Migration
     {
         Schema::create('movies', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('tmdb_id')->unsigned();
+            $table->integer('tmdb_id')->unsigned()->unique();
             $table->integer('director_id')->unsigned();
             $table->string('title',255);
+            $table->string('original_title',255);
             $table->double('budget');
             $table->string('homepage',255);
             $table->string('description', 10000);

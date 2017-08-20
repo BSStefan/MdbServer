@@ -26,6 +26,7 @@ class MovieCinemaReporitory extends Repository
                 }
             }
         }
+        dd($formatedInfo);
         DB::table('movie_cinema')->insert($formatedInfo);
     }
 }

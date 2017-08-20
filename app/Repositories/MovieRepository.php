@@ -12,7 +12,7 @@ class MovieRepository extends Repository
 
     public function findCurrentInCinema()
     {
-        $movies = $this->findBy('in_cinema', true);
+        $movies = $this->findWhere('in_cinema', true);
         $moviesTitleIdArray = [];
 
         foreach($movies as $movie) {

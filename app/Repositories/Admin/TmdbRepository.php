@@ -255,21 +255,22 @@ class TmdbRepository
      */
     private function formatMovie($movie)
     {
-        $newMovie                         = [];
-        $newMovie['movie']['tmdb_id']     = $movie->getId();
-        $newMovie['movie']['homepage']    = $movie->getHomepage();
-        $newMovie['movie']['title']       = $movie->getTitle();
-        $newMovie['movie']['language']    = $movie->getOriginalLanguage();
-        $newMovie['movie']['release_day'] = $movie->getReleaseDate()->format('Y-m-d H:i:s');
-        $newMovie['movie']['runtime']     = $movie->getRuntime();
-        $newMovie['movie']['tag_line']    = $movie->getTagline();
-        $newMovie['movie']['budget']      = $movie->getBudget();
-        $newMovie['movie']['description'] = $movie->getOverview();
-        $newMovie['genres']               = $this->formatSimpleCollection($movie->getGenres());
-        $newMovie['keywords']             = $this->formatSimpleCollection($movie->getKeywords());
-        $newMovie['movie']['image_url']   = 'http:' . $this->imageHelper->getUrl($movie->getPosterImage());
-        $newMovie['cast']                 = $this->formatCast($movie->getCredits()->getCast());
-        $newMovie['crew']                 = $this->formatCrew($movie->getCredits()->getCrew());
+        $newMovie                            = [];
+        $newMovie['movie']['tmdb_id']        = $movie->getId();
+        $newMovie['movie']['homepage']       = $movie->getHomepage();
+        $newMovie['movie']['title']          = $movie->getTitle();
+        $newMovie['movie']['original_title'] = $movie->getOriginalTitle();
+        $newMovie['movie']['language']       = $movie->getOriginalLanguage();
+        $newMovie['movie']['release_day']    = $movie->getReleaseDate()->format('Y-m-d H:i:s');
+        $newMovie['movie']['runtime']        = $movie->getRuntime();
+        $newMovie['movie']['tag_line']       = $movie->getTagline();
+        $newMovie['movie']['budget']         = $movie->getBudget();
+        $newMovie['movie']['description']    = $movie->getOverview();
+        $newMovie['genres']                  = $this->formatSimpleCollection($movie->getGenres());
+        $newMovie['keywords']                = $this->formatSimpleCollection($movie->getKeywords());
+        $newMovie['movie']['image_url']      = 'http:' . $this->imageHelper->getUrl($movie->getPosterImage());
+        $newMovie['cast']                    = $this->formatCast($movie->getCredits()->getCast());
+        $newMovie['crew']                    = $this->formatCrew($movie->getCredits()->getCrew());
 
         return $newMovie;
     }
