@@ -29,6 +29,9 @@ Route::group(['prefix' => 'auth'], function (){
         Route::get('logout', ['uses'=> 'User\AuthController@logoutUser', 'middleware' => 'auth.api'])->name('auth.mdb.logout');
     });
 });
+Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
+    Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
+});
 
 
 

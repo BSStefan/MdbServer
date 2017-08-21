@@ -23,17 +23,17 @@ class AuthController extends Controller
     /**
      * @var UserRepository
      */
-    protected $userRepository;
+    private $userRepository;
 
     /**
      * @var UserProviderRepository
      */
-    protected $userProviderRepository;
+    private $userProviderRepository;
 
     /**
      * @var JWTAuth
      */
-    protected $jwt;
+    private $jwt;
 
     public function __construct(
         UserRepository $userRepository,

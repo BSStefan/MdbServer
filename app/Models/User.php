@@ -53,4 +53,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         $this->attributes['password'] = bcrypt($value);
     }
+
+    public function likes()
+    {
+        return $this->hasMany(LikeDislike::class);
+    }
 }
