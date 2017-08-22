@@ -31,6 +31,8 @@ Route::group(['prefix' => 'auth'], function (){
     });
 });
 
+Route::get('seeder', 'SeederController@getInfo');
+
 
 
 
