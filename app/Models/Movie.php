@@ -37,6 +37,11 @@ class Movie extends Model
 
     public function projections()
     {
-        $this->hasMany(MovieCinema::class)->withTimestamps();
+        return $this->hasMany(MovieCinema::class)->withTimestamps();
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(LikeDislike::class);
     }
 }

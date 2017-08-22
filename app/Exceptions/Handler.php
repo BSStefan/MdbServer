@@ -47,6 +47,7 @@ class Handler extends ExceptionHandler
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
+
     {   var_dump($exception->getMessage());
         switch($exception){
             case ($exception instanceof ValidExcaption):
