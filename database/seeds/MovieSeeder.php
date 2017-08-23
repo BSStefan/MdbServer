@@ -47,7 +47,7 @@ class MovieSeeder extends Seeder
                 'title'          => $movie[3],
                 'original_title' => $movie[4],
                 'budget'         => $movie[5],
-                'home_page'      => $movie[6],
+                'homepage'      => $movie[6],
                 'description'    => $movie[7],
                 'language'       => $movie[8],
                 'tag_line'       => $movie[9],
