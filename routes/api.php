@@ -34,7 +34,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
     Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
 });
 
-Route::get('seeder', 'SeederController@getInfo');
+//Route::get('seeder', 'SeederController@getInfo');
 
 
 

@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Repositories\Eloquent\Repository;
 use App\Models\MovieCinema;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class MovieCinemaReporitory extends Repository
 {
@@ -17,16 +18,19 @@ class MovieCinemaReporitory extends Repository
             foreach($dates as $date) {
                 foreach($date as $infoMovie) {
                     if(isset($moviesTitleIdArray[$infoMovie['title']])) {
-                        $infoMovie['movie_id'] = $moviesTitleIdArray[$infoMovie['title']];
-                        $infoMovie['cinema_id'] = $cinemaId;
-                        unset($infoMovie['cinema']);
-                        unset($infoMovie['movie']);
-                        array_push($formatedInfo, $infoMovie);
+                        $movieFormated['movie_id'] = $moviesTitleIdArray[$infoMovie['title']];
+                        $movieFormated['cinema_id'] = $cinemaId;
+                        $movieFormated['time'] = $infoMovie['time'];
+                        $movieFormated['room'] = $infoMovie['room'];
+                        $movieFormated['url'] = $infoMovie['url'];
+                        $movieFormated['created_at'] = Carbon::now()->toDateTimeString();
+                        $movieFormated['updated_at'] = Carbon::now()->toDateTimeString();
+                        array_push($formatedInfo, $movieFormated);
                     }
                 }
             }
         }
-        dd($formatedInfo);
-        DB::table('movie_cinema')->insert($formatedInfo);
+
+        return DB::table('movie_cinema')->insert($formatedInfo);
     }
 }

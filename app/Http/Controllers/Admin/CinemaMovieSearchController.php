@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\Admin\CrawlerRepository;
 use App\Repositories\CinemaRepository;
 use Carbon\Carbon;
+use App\Http\Response\JsonResponse;
 
 class CinemaMovieSearchController extends Controller
 {
@@ -52,13 +53,18 @@ class CinemaMovieSearchController extends Controller
     public function findTimeCurrentMoviesInCinema()
     {
         $currentMoviesTitleId = $this->movieRepository->findCurrentInCinema();
+
         $weekInformation      = $this->findTimesCurrentMovies();
 
         if($this->movieCinemaReporitory->saveNewMoviesInCinema($currentMoviesTitleId, $weekInformation)) {
-            echo 'OK';
+            return response()->json(new JsonResponse([
+                'success' => true
+            ], '', 200));
         }
         else {
-            echo 'Fail';
+            return response()->json(new JsonResponse([
+                'success' => false
+            ], 'There was an problem', 400));
         }
     }
 }

@@ -12,6 +12,7 @@ use App\Repositories\Admin\TmdbRepository;
 use App\Repositories\DirectorRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\KeywordRepository;
+use App\Repositories\MovieModelRepository;
 use App\Repositories\MovieRepository;
 use App\Repositories\WriterRepository;
 use Carbon\Carbon;
@@ -43,6 +44,7 @@ class MovieController extends Controller
     private $genreRepository;
     private $keywordRepository;
     private $crawlerRepository;
+    private $movieModelRepository;
 
     public function __construct(
         TmdbRepository $tmdbRepository,
@@ -52,17 +54,19 @@ class MovieController extends Controller
         WriterRepository $writerRepository,
         GenreRepository $genreRepository,
         KeywordRepository $keywordRepository,
-        CrawlerRepository $crawlerRepository
+        CrawlerRepository $crawlerRepository,
+        MovieModelRepository $movieModelRepository
     )
     {
-        $this->tmdbRepository     = $tmdbRepository;
-        $this->movieRepository    = $movieRepository;
-        $this->directorRepository = $directorRepository;
-        $this->actorRepository    = $actorRepository;
-        $this->writerRepository   = $writerRepository;
-        $this->genreRepository    = $genreRepository;
-        $this->keywordRepository  = $keywordRepository;
-        $this->crawlerRepository  = $crawlerRepository;
+        $this->tmdbRepository       = $tmdbRepository;
+        $this->movieRepository      = $movieRepository;
+        $this->directorRepository   = $directorRepository;
+        $this->actorRepository      = $actorRepository;
+        $this->writerRepository     = $writerRepository;
+        $this->genreRepository      = $genreRepository;
+        $this->keywordRepository    = $keywordRepository;
+        $this->crawlerRepository    = $crawlerRepository;
+        $this->movieModelRepository = $movieModelRepository;
     }
 
     /**
@@ -300,18 +304,22 @@ class MovieController extends Controller
      */
     private function saveMovieFromTmdb($movie)
     {
-        $genres   = [];
-        $keywords = [];
-        $cast     = [];
-        $writers  = [];
+        $genres          = [];
+        $keywords        = [];
+        $cast            = [];
+        $writers         = [];
+        $movieShortModel = [];
 
-        $movie['movie']['director_id'] = $this->checkPersonAndSave($movie['crew']['director'][0], 'director', $this->directorRepository)->id;
-        $movie['movie']['image_url']   = $this->saveImageFromUrl($movie['movie']['image_url'], 'images/movies');
-        $movieModel                    = $this->movieRepository->save($movie['movie']);
+        $movie['movie']['director_id']  = $this->checkPersonAndSave($movie['crew']['director'][0], 'director', $this->directorRepository)->id;
+        $movie['movie']['image_url']    = $this->saveImageFromUrl($movie['movie']['image_url'], 'images/movies');
+        $movieModel                     = $this->movieRepository->save($movie['movie']);
+        $movieShortModel['director_id'] = $movieModel->director_id;
 
         foreach($movie['genres'] as $genre){
-            array_push($genres, $this->genreRepository->findBy('name', $genre)->id);
+            $genreId = $this->genreRepository->findBy('name', $genre)->id;
+            array_push($genres, $genreId);
         }
+        $movieShortModel['genres'] = implode('/', $genres);
         $movieModel->genres()->attach($genres);
 
         foreach($movie['keywords'] as $word){
@@ -326,19 +334,23 @@ class MovieController extends Controller
             }
             array_push($keywords, $wordModel->id);
         }
+        $movieShortModel['keywords'] = implode("/", $keywords);
         $movieModel->keywords()->attach($keywords);
 
         foreach($movie['cast'] as $actor){
             $actorModel = $this->checkPersonAndSave($actor[0], 'actor', $this->actorRepository);
             array_push($cast, $actorModel->id);
         }
+        $movieShortModel['actors'] = implode('/', $cast);
         $movieModel->actors()->attach($cast);
 
         foreach($movie['crew']['writers'] as $writer){
             $writerModel = $this->checkPersonAndSave($writer[0], 'writer', $this->writerRepository);
             array_push($writers, $writerModel->id);
         }
+        $movieShortModel['writers'] = implode('/', $writers);
         $movieModel->writers()->attach($writers);
+        $this->movieModelRepository->save($movieShortModel);
 
         return $movieModel;
     }

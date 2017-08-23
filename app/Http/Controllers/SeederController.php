@@ -67,12 +67,22 @@ class SeederController extends Controller
 
     public function getInfo()
     {
-        $movies = $this->movieRepository->all();
-        foreach($movies as $movie)
-        {
-            echo '['.$movie->id.','.$movie->tmdb_id.', "'.$movie->director_id.', "'.$movie->title.'", "'.$movie->original_title.'", "'.$movie->budget.'", "'.$movie->homepage.'", "'.$movie->description.'", "'.$movie->language.'", "'.$movie->tag_line.'", "'.$movie->release_day.'", "'.$movie->runtime.'", "'.$movie->image_url.'", "'.$movie->in_cinema.'" ],'. "\n";
-        }
+        //$movies = $this->movieRepository->all();
+        //foreach($movies as $movie)
+        //{
+        //    echo '['.$movie->id.','.$movie->tmdb_id.', "'.$movie->director_id.', "'.$movie->title.'", "'.$movie->original_title.'", "'.$movie->budget.'", "'.$movie->homepage.'", "'.$movie->description.'", "'.$movie->language.'", "'.$movie->tag_line.'", "'.$movie->release_day.'", "'.$movie->runtime.'", "'.$movie->image_url.'", "'.$movie->in_cinema.'" ],'. "\n";
+        //}
 
+        //$writers = $this->writerRepository->all();
+        //foreach($writers as $writer)
+        //{
+        //    echo '['.$writer->id.','.$writer->tmdb_id.', "'.$writer->name.'", "'.$writer->place_of_birth.'", "'.$writer->biography.'", "'.$writer->birthday.'", "'.$writer->dead_day.'", "'.$writer->gender.'", "'.$writer->image_url.'" ],'. "\n";
+        //}
+
+        $keywords = $this->keywordRepository->all();
+        foreach($keywords as $keyword){
+            echo '['.$keyword->id.',"'.$keyword->word.'"],'. "\n";
+        }
     }
 
 }
