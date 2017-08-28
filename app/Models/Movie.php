@@ -17,7 +17,7 @@ class Movie extends Model
 
     public function director()
     {
-        return $this->belongsTo(Director::class)->withTimestamps();
+        return $this->belongsTo(Director::class);
     }
 
     public function genres()
@@ -43,5 +43,15 @@ class Movie extends Model
     public function likes()
     {
         return $this->hasMany(LikeDislike::class);
+    }
+
+    public function like()
+    {
+        return $this->hasMany(LikeDislike::class)->where('is_like', true);
+    }
+
+    public function dislike()
+    {
+        return $this->hasMany(LikeDislike::class)->where('is_like', false);
     }
 }

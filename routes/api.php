@@ -30,8 +30,13 @@ Route::group(['prefix' => 'auth'], function (){
         Route::get('logout', ['uses'=> 'User\AuthController@logoutUser', 'middleware' => 'auth.api'])->name('auth.mdb.logout');
     });
 });
-Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
+//Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
+//    Route::get('movie/{id}', 'User\MovieController@getMovie');
+//    Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
+//});
+Route::group(['prefix' => 'user'], function (){
     Route::get('movie/{id}', 'User\MovieController@getMovie');
+    Route::get('genre-movies', 'User\MovieController@getMoviePerGenre');
     Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
 });
 

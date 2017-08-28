@@ -30,4 +30,16 @@ class GenreRepository extends Repository
 
         return false;
     }
+
+    public function getMovies($genreId)
+    {
+        $genre = $this->find($genreId);
+        $movies = $genre->movies;
+        $moviesFormatted = [];
+        foreach($movies as $movie){
+            $moviesFormatted[$movie->id] = $movie->getAttributes();
+        }
+
+        return $moviesFormatted;
+    }
 }
