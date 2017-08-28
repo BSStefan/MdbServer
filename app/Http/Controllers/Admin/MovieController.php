@@ -284,8 +284,6 @@ class MovieController extends Controller
                 else{
                     $response[$movie['movie']['title']] = false;
                 }
-                //TODO obrisati
-                return $response;
             }
             else{
                 $response[$movieModel->title] = 'Already exists';
@@ -313,6 +311,7 @@ class MovieController extends Controller
         $movie['movie']['director_id']  = $this->checkPersonAndSave($movie['crew']['director'][0], 'director', $this->directorRepository)->id;
         $movie['movie']['image_url']    = $this->saveImageFromUrl($movie['movie']['image_url'], 'images/movies');
         $movieModel                     = $this->movieRepository->save($movie['movie']);
+        $movieShortModel['movie_id'] = $movieModel->id;
         $movieShortModel['director_id'] = $movieModel->director_id;
 
         foreach($movie['genres'] as $genre){

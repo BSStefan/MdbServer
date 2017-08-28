@@ -109,26 +109,29 @@ class MovieRepository extends Repository
 
     public function checkIfUserWatchedMovie($movieId, $userId, $watchOrToBeWatched)
     {
-        return $this->model->select('watched_movies.id')
-            ->join('watched_movies', 'movies.id', '=', 'watched_movies.movie_id')
-            ->where('watched_movies.movie_id', $movieId)
-            ->where('watched_movies.user_id', $userId)
-            ->where('watched_movies.' . $watchOrToBeWatched, true)
+        return $this->model->select('watch_movies.id')
+            ->join('watch_movies', 'movies.id', '=', 'watch_movies.movie_id')
+            ->where('watch_movies.movie_id', $movieId)
+            ->where('watch_movies.user_id', $userId)
+            ->where('watch_movies.' . $watchOrToBeWatched, true)
             ->first();
     }
 
-    public function getNewMovies()
+    public function getNewMovies($perPage)
     {
         $movies = $this->model
             ->orderBy('release_day', 'DESC')
-            ->limit(12)
-            ->get();
+            ->paginate($perPage);
 
+        $paginator = [
+            'previous_page' => $movies->previousPageUrl(),
+            'next_page'  => $movies->nextPageUrl()
+        ];
         $moviesFormatted = [];
         foreach($movies as $movie){
             $moviesFormatted[$movie->id] = $movie->getAttributes();
         }
 
-        return $moviesFormatted;
+        return [$moviesFormatted, $paginator];
     }
 }

@@ -8,6 +8,7 @@ use App\Repositories\KeywordRepository;
 use App\Repositories\MovieRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MovieController extends Controller
 {
@@ -26,46 +27,55 @@ class MovieController extends Controller
         $this->keywordRepository = $keywordRepository;
     }
 
-    public function getMovie($id)
+    public function getMovie(Request $request)
     {
-        $movie = $this->movieRepository->findMovie(1);
-        //User autentifikacija, ako je user onda porveri rekakciju ako nije onda nis
-        $userReaction = $this->movieRepository->findUserReaction($id,1);
+        $movie = $this->movieRepository->findMovie($request->get('movie_id'));
+        $user  = JWTAuth::user();
+        if(!$user->is_admin){
+            $userReaction = $this->movieRepository->findUserReaction($request->get('movie_id'), $user->id);
+            return response()->json(new JsonResponse([
+                'movie' => $movie,
+                'user_reaction' => $userReaction
+            ]));
+        }
         return response()->json(new JsonResponse([
-            'movie' => $movie,
-            'user_reaction' => $userReaction
+            'movie' => null
         ]));
     }
 
     public function getMoviePerGenre(Request $request)
     {
-        $movies = $this->genreRepository->getMovies($request->genre_id);
-        $formattedMovies = $this->formatMovieOptions($movies);
+        $user  = JWTAuth::user();
+        $movies = $this->genreRepository->getMovies($request->get('genre_id'));
+        $formattedMovies = $this->formatMovieOptions($movies, $user->id);
 
         return response()->json(new JsonResponse($formattedMovies));
     }
 
     public function getMoviePerKeyword(Request $request)
     {
+        $user  = JWTAuth::user();
         $movies = $this->keywordRepository->getMovies($request->keyword_id);
-        $formattedMovies = $this->formatMovieOptions($movies);
+        $formattedMovies = $this->formatMovieOptions($movies, $user->id);
 
         return response()->json(new JsonResponse($formattedMovies));
     }
 
-    public function getNewMovies()
+    public function getNewMovies($perPage)
     {
-        $movies = $this->movieRepository->getNewMovies();
-        $formattedMovies = $this->formatMovieOptions($movies);
+        $user  = JWTAuth::user();
+        $response = $this->movieRepository->getNewMovies($perPage);
+        $movies = $response[0];
+        $formattedMovies = $this->formatMovieOptions($movies, $user->id);
 
-        return response()->json(new JsonResponse($formattedMovies));
+        return response()->json(new JsonResponse(['movies' => $formattedMovies, 'paginator' => $response[1]]));
     }
 
-    private function formatMovieOptions($movies)
+    private function formatMovieOptions($movies, $userId)
     {
         $formattedMovies = [];
         foreach($movies as $movie){
-            $userReaction                  = $this->movieRepository->findUserReaction($movie['id'], 1);
+            $userReaction                  = $this->movieRepository->findUserReaction($movie['id'], $userId);
             $formattedMovies[$movie['id']] = [
                 'movie'         => array_merge($movie, $this->movieRepository->findNumberOfLikesDislikes($movie['id'])),
                 'user_reaction' => $userReaction

@@ -34,7 +34,12 @@ class LikeDislikeController extends Controller
     public function likeDislikeMovie(Request $request)
     {
         $user  = JWTAuth::user();
-        $movie = $this->movieRepository->find($request->input('movie_id'));
+        try{
+            $movie = $this->movieRepository->find($request->input('movie_id'));
+        }
+        catch(\Exception $e){
+            return response()->json(new JsonResponse(['success' => false, 'like_dislike' => null], 'Movie not found', 400), 400);
+        }
 
         $this->validate($request, [
             'movie_id' => 'required|integer',
@@ -58,7 +63,7 @@ class LikeDislikeController extends Controller
             return response()->json(new JsonResponse(['success' => true, 'like_dislike' => $likeDislike]));
         }
         else{
-            return response()->json(new JsonResponse(['success' => false, 'like_dislike' => null]));
+            return response()->json(new JsonResponse(['success' => false, 'like_dislike' => null]), 400);
         }
     }
 }

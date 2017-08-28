@@ -43,6 +43,10 @@ class CreateMoviesTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('movie_cinemas');
+        Schema::dropIfExists('watched_movies');
+        Schema::dropIfExists('like_dislikes');
+        Schema::dropIfExists('similar_movies');
         Schema::dropIfExists('movies');
     }
 }

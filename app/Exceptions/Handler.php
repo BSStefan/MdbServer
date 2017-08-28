@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use Dotenv\Exception\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException as ValidExcaption;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
@@ -47,9 +48,12 @@ class Handler extends ExceptionHandler
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
-
-    {   var_dump($exception->getMessage()); exit;
+    {
+        var_dump($exception); exit;
         switch($exception){
+            case ($exception instanceof ModelNotFoundException):
+                return response()->json(new JsonResponse('', $exception->getMessage(), 404), 404);
+            break;
             case ($exception instanceof ValidExcaption):
                 return response()->json(new JsonResponse('', $exception->getMessage(), 400), 400);
             break;

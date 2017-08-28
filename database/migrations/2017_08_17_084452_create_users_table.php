@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->enum('gender',['male','female'])->nullable();
             $table->date('birthday')->nullable();
             $table->string('city')->nullable();
+            $table->boolean('is_admin')->default(false);
             $table->timestamps();
         });
     }
@@ -33,6 +34,7 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('watch_movies');
         Schema::dropIfExists('user_providers');
         Schema::dropIfExists('users');
     }

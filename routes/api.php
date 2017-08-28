@@ -30,15 +30,19 @@ Route::group(['prefix' => 'auth'], function (){
         Route::get('logout', ['uses'=> 'User\AuthController@logoutUser', 'middleware' => 'auth.api'])->name('auth.mdb.logout');
     });
 });
-//Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
-//    Route::get('movie/{id}', 'User\MovieController@getMovie');
-//    Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
-//});
-Route::group(['prefix' => 'user'], function (){
+Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
     Route::get('movie/{id}', 'User\MovieController@getMovie');
     Route::get('genre-movies', 'User\MovieController@getMoviePerGenre');
     Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
+    Route::get('watched-to-be-watched/{type}', 'User\WatchMovieController@getMovies');
+    Route::post('watched-to-be-watched', 'User\WatchMovieController@addMovie');
+    Route::get('new-movies/{perPage}', 'User\MovieController@getNewMovies');
 });
+//Route::group(['prefix' => 'user'], function (){
+//    Route::get('movie', 'User\MovieController@getMovie');
+//    Route::get('genre-movies', 'User\MovieController@getMoviePerGenre');
+//    Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
+//});
 
 Route::get('image', 'Web\ImageController@getImage');
 
