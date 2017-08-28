@@ -31,6 +31,7 @@ Route::group(['prefix' => 'auth'], function (){
     });
 });
 Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
+    Route::get('movie/{id}', 'User\MovieController@getMovie');
     Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
 });
 
