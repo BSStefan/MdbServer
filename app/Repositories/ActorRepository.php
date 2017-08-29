@@ -10,4 +10,13 @@ class ActorRepository extends Repository
 {
     protected $modelClass = Actor::class;
 
+    public function getActorDetails($actorId)
+    {
+        $actor = $this->find($actorId);
+        $actor->movies;
+
+        return ['actor' => $actor];
+
+    }
+
 }

@@ -32,17 +32,18 @@ Route::group(['prefix' => 'auth'], function (){
 });
 Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
     Route::get('movie/{id}', 'User\MovieController@getMovie');
-    Route::get('genre-movies', 'User\MovieController@getMoviePerGenre');
+    Route::get('genre-movies/{id}', 'User\MovieController@getMoviePerGenre');
+    Route::get('keyword-movies/{id}', 'User\MovieController@getMoviePerKeyword');
     Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
+    Route::get('like-dislike/{type}', 'User\MovieController@getLikeDislikeMovies');
+    Route::get('most-liked', 'User\MovieController@getMostLiked');
     Route::get('watched-to-be-watched/{type}', 'User\WatchMovieController@getMovies');
     Route::post('watched-to-be-watched', 'User\WatchMovieController@addMovie');
     Route::get('new-movies/{perPage}', 'User\MovieController@getNewMovies');
+    Route::get('actor/{id}', 'User\ActorController@getActorWithDetails');
+    Route::get('director/{id}', 'User\DirectorController@getDirectorWithDetails');
+    Route::get('writer/{id}', 'User\WriterController@getWriterWithDetails');
 });
-//Route::group(['prefix' => 'user'], function (){
-//    Route::get('movie', 'User\MovieController@getMovie');
-//    Route::get('genre-movies', 'User\MovieController@getMoviePerGenre');
-//    Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
-//});
 
 Route::get('image', 'Web\ImageController@getImage');
 

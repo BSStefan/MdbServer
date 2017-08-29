@@ -40,7 +40,7 @@ class Movie extends Model
         return $this->hasMany(MovieCinema::class)->withTimestamps();
     }
 
-    public function likes()
+    public function likeDislikes()
     {
         return $this->hasMany(LikeDislike::class);
     }

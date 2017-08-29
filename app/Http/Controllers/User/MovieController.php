@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Response\JsonResponse;
 use App\Repositories\GenreRepository;
 use App\Repositories\KeywordRepository;
+use App\Repositories\LikeDislikeRepository;
 use App\Repositories\MovieRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -15,24 +16,27 @@ class MovieController extends Controller
     private $movieRepository;
     private $genreRepository;
     private $keywordRepository;
+    private $likeDislikeRepository;
 
     public function __construct(
         MovieRepository $movieRepository,
         GenreRepository $genreRepository,
-        KeywordRepository $keywordRepository
+        KeywordRepository $keywordRepository,
+        LikeDislikeRepository $likeDislikeRepository
     )
     {
-        $this->movieRepository = $movieRepository;
-        $this->genreRepository = $genreRepository;
-        $this->keywordRepository = $keywordRepository;
+        $this->movieRepository       = $movieRepository;
+        $this->genreRepository       = $genreRepository;
+        $this->keywordRepository     = $keywordRepository;
+        $this->likeDislikeRepository = $likeDislikeRepository;
     }
 
-    public function getMovie(Request $request)
+    public function getMovie($id)
     {
-        $movie = $this->movieRepository->findMovie($request->get('movie_id'));
+        $movie = $this->movieRepository->findMovie($id);
         $user  = JWTAuth::user();
         if(!$user->is_admin){
-            $userReaction = $this->movieRepository->findUserReaction($request->get('movie_id'), $user->id);
+            $userReaction = $this->movieRepository->findUserReaction($id, $user->id);
             return response()->json(new JsonResponse([
                 'movie' => $movie,
                 'user_reaction' => $userReaction
@@ -43,22 +47,24 @@ class MovieController extends Controller
         ]));
     }
 
-    public function getMoviePerGenre(Request $request)
+    public function getMoviePerGenre($id)
     {
         $user  = JWTAuth::user();
-        $movies = $this->genreRepository->getMovies($request->get('genre_id'));
+        $response = $this->genreRepository->getMovies($id, 20);
+        $movies = $response[0];
         $formattedMovies = $this->formatMovieOptions($movies, $user->id);
 
-        return response()->json(new JsonResponse($formattedMovies));
+        return response()->json(new JsonResponse(['movies' => $formattedMovies, 'paginator' => $response[1]]));
     }
 
-    public function getMoviePerKeyword(Request $request)
+    public function getMoviePerKeyword($id)
     {
         $user  = JWTAuth::user();
-        $movies = $this->keywordRepository->getMovies($request->keyword_id);
+        $response = $this->keywordRepository->getMovies($id, 20);
+        $movies = $response[0];
         $formattedMovies = $this->formatMovieOptions($movies, $user->id);
 
-        return response()->json(new JsonResponse($formattedMovies));
+        return response()->json(new JsonResponse(['movies' => $formattedMovies, 'paginator' => $response[1]]));
     }
 
     public function getNewMovies($perPage)
@@ -69,6 +75,28 @@ class MovieController extends Controller
         $formattedMovies = $this->formatMovieOptions($movies, $user->id);
 
         return response()->json(new JsonResponse(['movies' => $formattedMovies, 'paginator' => $response[1]]));
+    }
+
+    public function getLikeDislikeMovies($type)
+    {
+        $user  = JWTAuth::user();
+        $response = $this->likeDislikeRepository->getLikesDislikes($user->id, $type, 20);
+        $movies = $response[0];
+
+        $formattedMovies = $this->formatMovieOptions($movies, $user->id);
+
+        return response()->json(new JsonResponse(['movies' => $formattedMovies,'paginator' => $response[1]]));
+    }
+
+    public function getMostLiked()
+    {
+        $user  = JWTAuth::user();
+        $response = $this->likeDislikeRepository->getMostLiked(20);
+        $movies = $response[0];
+
+        $formattedMovies = $this->formatMovieOptions($movies, $user->id);
+
+        return response()->json(new JsonResponse(['movies' => $formattedMovies,'paginator' => $response[1]]));
     }
 
     private function formatMovieOptions($movies, $userId)
@@ -84,4 +112,6 @@ class MovieController extends Controller
 
         return $formattedMovies;
     }
+
+
 }

@@ -12,6 +12,6 @@ class Director extends Model
 
     public function movies()
     {
-         return $this->hasMany(Movie::class)->withTimestamps();
+         return $this->hasMany(Movie::class);
     }
 }

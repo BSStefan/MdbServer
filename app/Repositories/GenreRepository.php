@@ -31,15 +31,19 @@ class GenreRepository extends Repository
         return false;
     }
 
-    public function getMovies($genreId)
+    public function getMovies($genreId, $perPage)
     {
         $genre = $this->find($genreId);
-        $movies = $genre->movies;
+        $movies = $genre->movies()->paginate($perPage);
+        $paginator = [
+            'previous_page' => $movies->previousPageUrl(),
+            'next_page'  => $movies->nextPageUrl()
+        ];
         $moviesFormatted = [];
         foreach($movies as $movie){
             $moviesFormatted[$movie->id] = $movie->getAttributes();
         }
 
-        return $moviesFormatted;
+        return [$moviesFormatted, $paginator];
     }
 }
