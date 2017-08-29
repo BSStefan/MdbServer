@@ -32,7 +32,9 @@ Route::group(['prefix' => 'auth'], function (){
 });
 Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
     Route::get('movie/{id}', 'User\MovieController@getMovie');
+    Route::get('genres', 'User\GenreController@getGenres');
     Route::get('genre-movies/{id}', 'User\MovieController@getMoviePerGenre');
+    Route::get('current-in-cinema/{perPage}', 'User\MovieController@getCurrentInCinema');
     Route::get('keyword-movies/{id}', 'User\MovieController@getMoviePerKeyword');
     Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
     Route::get('like-dislike/{type}', 'User\MovieController@getLikeDislikeMovies');
@@ -43,6 +45,12 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth.api'], function (){
     Route::get('actor/{id}', 'User\ActorController@getActorWithDetails');
     Route::get('director/{id}', 'User\DirectorController@getDirectorWithDetails');
     Route::get('writer/{id}', 'User\WriterController@getWriterWithDetails');
+    Route::group(['prefix' => 'info'],function (){
+        Route::get('get', 'User\UserController@getInfo');
+        Route::put('update', 'User\UserController@updateInfo');
+        Route::put('update-password', 'User\UserController@updatePassword');
+
+    });
 });
 
 Route::get('image', 'Web\ImageController@getImage');

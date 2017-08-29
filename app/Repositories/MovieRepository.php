@@ -134,4 +134,22 @@ class MovieRepository extends Repository
 
         return [$moviesFormatted, $paginator];
     }
+
+    public function getCurrentInCinemaMovies($perPage)
+    {
+        $movies = $this->model
+            ->where('in_cinema', '=', true)
+            ->orderBy('release_day', 'DESC')
+            ->paginate($perPage);
+        $paginator = [
+            'previous_page' => $movies->previousPageUrl(),
+            'next_page'  => $movies->nextPageUrl()
+        ];
+        $moviesFormatted = [];
+        foreach($movies as $movie){
+            $moviesFormatted[$movie->id] = $movie->getAttributes();
+        }
+
+        return [$moviesFormatted, $paginator];
+    }
 }

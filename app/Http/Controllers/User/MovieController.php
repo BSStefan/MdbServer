@@ -77,6 +77,16 @@ class MovieController extends Controller
         return response()->json(new JsonResponse(['movies' => $formattedMovies, 'paginator' => $response[1]]));
     }
 
+    public function getCurrentInCinema($perPage)
+    {
+        $user  = JWTAuth::user();
+        $response = $this->movieRepository->getCurrentInCinemaMovies($perPage);
+        $movies = $response[0];
+        $formattedMovies = $this->formatMovieOptions($movies, $user->id);
+
+        return response()->json(new JsonResponse(['movies' => $formattedMovies, 'paginator' => $response[1]]));
+    }
+
     public function getLikeDislikeMovies($type)
     {
         $user  = JWTAuth::user();
