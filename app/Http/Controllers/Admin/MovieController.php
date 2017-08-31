@@ -12,6 +12,7 @@ use App\Repositories\Admin\TmdbRepository;
 use App\Repositories\DirectorRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\KeywordRepository;
+use App\Repositories\LikeDislikeRepository;
 use App\Repositories\MovieModelRepository;
 use App\Repositories\MovieRepository;
 use App\Repositories\WriterRepository;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Controller;
 use Tmdb\Client;
 use Tmdb\Repository\SearchRepository;
 use App\Repositories\Eloquent\Repository;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MovieController extends Controller
 {
@@ -259,6 +261,35 @@ class MovieController extends Controller
         return response()->json(new JsonResponse($response));
     }
 
+    public function registerUserMovies(Request $request, LikeDislikeRepository $likeDislikeRepository, SearchRepository $searchRepository)
+    {
+        $this->validate($request, [
+            'movie1' => 'required|min:3',
+            'movie2' => 'required|min:3',
+            'movie3' => 'required|min:3',
+        ]);
+
+        $user = JWTAuth::user();
+
+        foreach($request->all() as $movie){
+            try{
+                $movieModel = $this->movieRepository->findBy('title', $movie);
+            }
+            catch(ModelNotFoundException $e){
+                $id = $this->tmdbRepository->findByName($movie, null, $searchRepository);
+                $movieTmdb = $this->tmdbRepository->getMovie($id);
+                $movieModel = $this->saveMovieFromTmdb($movieTmdb);
+            }
+            $likeDislikeRepository->save([
+                'user_id' => $user->id,
+                'movie_id' => $movieModel->id,
+                'is_like' => true
+            ]);
+        }
+
+        return response()->json(new JsonResponse(['success' => true]));
+    }
+
     /**
      * Method for saving multiple movies from array
      *
@@ -412,4 +443,5 @@ class MovieController extends Controller
                 return null;
         }
     }
+
 }

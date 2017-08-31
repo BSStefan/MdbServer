@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Response\JsonResponse;
+use App\Repositories\Admin\TmdbRepository;
 use App\Repositories\GenreRepository;
 use App\Repositories\KeywordRepository;
 use App\Repositories\LikeDislikeRepository;
 use App\Repositories\MovieRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Tmdb\Repository\SearchRepository;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class MovieController extends Controller
@@ -121,6 +123,33 @@ class MovieController extends Controller
         }
 
         return $formattedMovies;
+    }
+
+    public function getSearchMovie(Request $request, SearchRepository $searchRepository, TmdbRepository $tmdbRepository)
+    {
+        $this->validate($request,[
+           'movie' => 'required|min:3'
+        ]);
+
+        $movies = $this->movieRepository->searchMovie($request->get('movie'));
+
+        if($movies) {
+            return response()->json(new JsonResponse($movies));
+        }
+        else {
+            $ids = $tmdbRepository->findMoviesByName($request->get('movie'), null, $searchRepository);
+            $moviesTmdb = [];
+            if($ids){
+                foreach($ids as $id){
+                    $movieTmdb = $tmdbRepository->getMovie($id);
+                    array_push($moviesTmdb, $movieTmdb['movie']['title']);
+                }
+                return response()->json(new JsonResponse($moviesTmdb));
+            }
+            else{
+                return response()->json(new JsonResponse(['sucess' => false],'',400),400);
+            }
+        }
     }
 
 

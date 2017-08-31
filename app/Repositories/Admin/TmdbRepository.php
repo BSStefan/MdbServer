@@ -368,4 +368,21 @@ class TmdbRepository
         return null;
     }
 
+    public function findMoviesByName($movie, $year = null, SearchRepository $searchRepository)
+    {
+        $options = new MovieSearchQuery();
+        $options->includeAdult(false)->year($year);
+        $movies = $searchRepository->searchMovie($movie, $options);
+
+        $ids = [];
+        foreach($movies as $movie){
+            array_push($ids, $movie->getId());
+            if(count($ids) == 5){
+                return $ids;
+            }
+        }
+
+        return null;
+    }
+
 }

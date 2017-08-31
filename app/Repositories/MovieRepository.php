@@ -152,4 +152,19 @@ class MovieRepository extends Repository
 
         return [$moviesFormatted, $paginator];
     }
+
+    public function searchMovie($title)
+    {
+        $movies = $this->model->select()
+            ->where('title', 'LIKE', '%'.$title.'%')
+            ->limit(5)
+            ->get();
+
+        $moviesFormated = [];
+        foreach($movies as $movie){
+            array_push($moviesFormated, $movie->title);
+        }
+
+        return $moviesFormated;
+    }
 }

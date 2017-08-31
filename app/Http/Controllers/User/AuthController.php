@@ -120,7 +120,7 @@ class AuthController extends Controller
             if(!$token = $this->jwt->attempt($request->only('email', 'password'))){
                 return response()->json(new JsonResponse([
                     'success' => false, 'token' => null
-                ], 'Bad credentials', 403), 403);
+                ], 'Bad credentials', 200, true), 200);
             }
         }
         catch(TokenExpiredException $e){
@@ -132,9 +132,12 @@ class AuthController extends Controller
             ], $e->getMessage(), 401), 401);
         }
 
+        $user = JWTAuthFacade::user();
         return response()->json(new JsonResponse([
             'success' => true,
-            'token'   => $token
+            'token'   => $token,
+            'first_name' => $user->first_name,
+            'last_name'  => $user->last_name
         ]));
     }
 
@@ -150,7 +153,7 @@ class AuthController extends Controller
             'email'      => 'required|email|unique:users',
             'first_name' => 'required|min:2|max:50',
             'last_name'  => 'required|min:2|max:50',
-            'gender'     => 'required',
+            'gender'     => 'nullable',
             'password'   => 'required|min:6|max:255',
             'birthday'   => 'nullable|date',
             'city'       => 'nullable|string'
@@ -168,10 +171,20 @@ class AuthController extends Controller
         if($user){
             $token = $this->jwt->fromUser($user);
 
-            return response()->json(new JsonResponse(['success' => true, 'token' => $token]));
+            return response()->json(new JsonResponse([
+                'success' => true,
+                'token' => $token,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name
+            ]));
         }
         else{
-            return response()->json(new JsonResponse(['success' => true, 'token' => null]));
+            return response()->json(new JsonResponse([
+                'success' => false,
+                'token' => null,
+                'first_name' => null,
+                'last_name' => null
+            ], 'User is not registered', 200, true));
         }
     }
 

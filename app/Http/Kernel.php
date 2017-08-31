@@ -25,6 +25,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        CorsMiddleware::class
     ];
 
     /**
@@ -65,6 +66,7 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'auth.api' => \App\Http\Middleware\AuthCheckToken::class,
-        'refresh-token' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class
+        'refresh-token' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
+        'cors' => CorsMiddleware::class,
     ];
 }
