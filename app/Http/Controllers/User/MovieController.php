@@ -100,10 +100,10 @@ class MovieController extends Controller
         return response()->json(new JsonResponse(['movies' => $formattedMovies,'paginator' => $response[1]]));
     }
 
-    public function getMostLiked()
+    public function getMostLiked($perPage)
     {
         $user  = JWTAuth::user();
-        $response = $this->likeDislikeRepository->getMostLiked(20);
+        $response = $this->likeDislikeRepository->getMostLiked($perPage);
         $movies = $response[0];
 
         $formattedMovies = $this->formatMovieOptions($movies, $user->id);
@@ -116,7 +116,7 @@ class MovieController extends Controller
         $formattedMovies = [];
         foreach($movies as $movie){
             $userReaction                  = $this->movieRepository->findUserReaction($movie['id'], $userId);
-            $formattedMovies[$movie['id']] = [
+            $formattedMovies[] = [
                 'movie'         => array_merge($movie, $this->movieRepository->findNumberOfLikesDislikes($movie['id'])),
                 'user_reaction' => $userReaction
             ];

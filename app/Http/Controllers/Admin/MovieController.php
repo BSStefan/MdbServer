@@ -228,8 +228,14 @@ class MovieController extends Controller
         $this->movieRepository->restartCurrentInCinema();
 
         $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
+
+        $i = 0;
         $response = [];
         foreach($movies as $movie) {
+            $i++;
+            if($i>20) {
+                return response()->json(new JsonResponse($response));
+            }
             try{
                 $movieModel = $this->movieRepository->findBy('original_title', $movie);
             }
@@ -237,24 +243,29 @@ class MovieController extends Controller
                 $movieModel = null;
             }
             if(!$movieModel){
-                $id = $this->tmdbRepository->findByName($movie, Carbon::today()->year, $searchRepository);
-                $movieTmdb = $this->tmdbRepository->getMovie($id);
                 try{
+                    $id = $this->tmdbRepository->findByName($movie, Carbon::today()->year, $searchRepository);
+                    $movieTmdb = $this->tmdbRepository->getMovie($id);
                     $movieModel = $this->movieRepository->findBy('tmdb_id', $id);
                 }
                 catch(ModelNotFoundException $e){
                     $movieModel = $this->saveMovieFromTmdb($movieTmdb);
                 }
+                catch(\Exception $e){
+                    $response[$movie] = false;
+                }
             }
-            $movieModel->in_cinema = true;
+            if(!isset($response[$movie])){
+                $movieModel->in_cinema = true;
 
-            $movieModel = $this->movieRepository->save($movieModel->getAttributes(), $movieModel->id);
+                $movieModel = $this->movieRepository->save($movieModel->getAttributes(), $movieModel->id);
 
-            if($movieModel){
-                $response[$movie] = true;
-            }
-            else{
-                $response[$movie] = false;
+                if($movieModel){
+                    $response[$movie] = true;
+                }
+                else{
+                    $response[$movie] = false;
+                }
             }
         }
 

@@ -6,7 +6,9 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
+use Symfony\Component\HttpFoundation\File\File;
 
 class Controller extends BaseController
 {
@@ -16,7 +18,18 @@ class Controller extends BaseController
     {
         $extension = pathinfo($url,PATHINFO_EXTENSION);
         $fullName =  $path . '/' . md5(microtime()) . '.' . $extension;
-        //Image::make($url)->save(public_path($fullName));
+        try{
+            $image = Image::make($url)->encode('jpg', 60);
+            $image->save(public_path($fullName));
+            $saved_image_uri = $image->dirname.'/'.$image->basename;
+            $uploaded_thumbnail_image = Storage::putFileAs('public/', new File($saved_image_uri), $fullName);
+            $image->destroy();
+            unlink($saved_image_uri);
+        }
+        catch(\Exception $e){
+            $fullName = 'No image';
+        }
+
         return $fullName;
     }
 }

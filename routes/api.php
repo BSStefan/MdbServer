@@ -40,7 +40,7 @@ Route::group(['middleware' => 'cors'], function (){
         Route::get('keyword-movies/{id}', 'User\MovieController@getMoviePerKeyword');
         Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
         Route::get('like-dislike/{type}', 'User\MovieController@getLikeDislikeMovies');
-        Route::get('most-liked', 'User\MovieController@getMostLiked');
+        Route::get('most-liked/{perPage}', 'User\MovieController@getMostLiked');
         Route::get('watched-to-be-watched/{type}', 'User\WatchMovieController@getMovies');
         Route::post('watched-to-be-watched', 'User\WatchMovieController@addMovie');
         Route::get('new-movies/{perPage}', 'User\MovieController@getNewMovies');
