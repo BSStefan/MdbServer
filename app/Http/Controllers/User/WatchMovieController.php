@@ -45,7 +45,7 @@ class WatchMovieController extends Controller
         ]);
         $user = JWTAuth::user();
         $movie = $this->movieRepository->find($request->input('movie_id'));
-        $watchMovie = $this->watchMovieRepository->addToList($user->id, $movie->id, $request->input('to_be_watched'));
+        $watchMovie = $this->watchMovieRepository->addToList($movie->id, $user->id, $request->input('to_be_watched'));
         if($watchMovie){
             return response()->json(new JsonResponse([
                 'success' => true,

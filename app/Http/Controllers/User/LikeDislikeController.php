@@ -48,10 +48,27 @@ class LikeDislikeController extends Controller
 
         try{
             $likeDislike = $this->likeDislikeRepository->checkIfUserAlreadyLikedDislikedMovie($user->id, $movie->id);
-            $likeDislike = $this->likeDislikeRepository->save(['is_like' => $request->is_like], $likeDislike->id);
+            if($likeDislike->is_like == $request->is_like) {
+                $likeDislike->delete($likeDislike->id);
+                $movieLikes = $this->movieRepository->findNumberOfLikesDislikes($request->input('movie_id'));
+                return response()->json(new JsonResponse([
+                    'success' => true,
+                    'like_dislike' => [
+                        'movie_id' => $movie->id,
+                        'user_id' => $user->id,
+                        'like'    => false,
+                        'dislike' => false,
+                        'likes' => $movieLikes['likes'],
+                        'dislikes' => $movieLikes['dislikes']
+                    ]
+                ]));
+            }
+            else{
+                $likeDislike = $this->likeDislikeRepository->save(['is_like' => $request->is_like], $likeDislike->id);
+            }
+
         }
         catch(ModelNotFoundException $e){
-            $likeDislike = null;
             $likeDislike = $this->likeDislikeRepository->save([
                 'user_id'  => $user->id,
                 'movie_id' => $movie->id,
@@ -60,7 +77,19 @@ class LikeDislikeController extends Controller
         }
 
         if($likeDislike){
-            return response()->json(new JsonResponse(['success' => true, 'like_dislike' => $likeDislike]));
+            $like       = $likeDislike->is_like ? true : false;
+            $disLike    = $likeDislike->is_like ? false : true;
+            $movieLikes = $this->movieRepository->findNumberOfLikesDislikes($request->input('movie_id'));
+
+            return response()->json(new JsonResponse([
+                'success'      => true,
+                'like_dislike' => array_merge($likeDislike->getAttributes(), [
+                    'likes'    => $movieLikes['likes'],
+                    'dislikes' => $movieLikes['dislikes'],
+                    'like'     => $like,
+                    'dislike'  => $disLike
+                ])
+            ]));
         }
         else{
             return response()->json(new JsonResponse(['success' => false, 'like_dislike' => null]), 400);

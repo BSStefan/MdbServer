@@ -47,16 +47,20 @@ class MovieRepository extends Repository
         $keywords       = [];
 
         foreach($actorsModels as $actor){
-            $actors[$actor->id] = $actor->name;
+            array_push($actors, ['id' => $actor->id, 'name' => $actor->name]);
+            //$actors[$actor->id] = $actor->name;
         }
         foreach($writersModels as $writer){
-            $writers[$writer->id] = $writer->name;
+            array_push($writers, ['id' => $writer->id, 'name' => $writer->name]);
+            //$writers[$writer->id] = $writer->name;
         }
         foreach($genresModels as $genre){
-            $genres[$genre->id] = $genre->name;
+            array_push($genres, ['id' => $genre->id, 'name' => $genre->name]);
+            //$genres[$genre->id] = $genre->name;
         }
         foreach($keywordsModels as $keyword){
-            $keywords[$keyword->id] = $keyword->word;
+            array_push($keywords, ['id' => $keyword->id, 'word' => $keyword->word]);
+            //$keywords[$keyword->id] = $keyword->word;
         }
         $director[$directorModel->id] = $directorModel->name;
 
@@ -77,14 +81,14 @@ class MovieRepository extends Repository
         $movie = $this->find($id);
         return [
             'likes' => count($movie->like),
-            'dislike' => count($movie->dislike)
+            'dislikes' => count($movie->dislike)
         ];
     }
 
     public function findUserReaction($movieId, $userId)
     {
-        $userLiked       = $this->checkIfUserReactMovie($movieId, 1, 'like') ? true : false;
-        $userDisliked    = $this->checkIfUserReactMovie($movieId, 1, 'dislike') ? true : false;
+        $userLiked       = $this->checkIfUserReactMovie($movieId, $userId, 'like') ? true : false;
+        $userDisliked    = $this->checkIfUserReactMovie($movieId, $userId, 'dislike') ? true : false;
         $userWatched     = $this->checkIfUserWatchedMovie($movieId, $userId, 'already_watched') ? true : false;
         $userInWatchList = $this->checkIfUserWatchedMovie($movieId, $userId, 'to_be_watched') ? true : false;
 
