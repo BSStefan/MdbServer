@@ -49,10 +49,10 @@ class MovieController extends Controller
         ]));
     }
 
-    public function getMoviePerGenre($id)
+    public function getMoviePerGenre($id, $perGenre)
     {
         $user  = JWTAuth::user();
-        $response = $this->genreRepository->getMovies($id, 20);
+        $response = $this->genreRepository->getMovies($id, $perGenre);
         $movies = $response[0];
         $formattedMovies = $this->formatMovieOptions($movies, $user->id);
 
@@ -89,15 +89,18 @@ class MovieController extends Controller
         return response()->json(new JsonResponse(['movies' => $formattedMovies, 'paginator' => $response[1]]));
     }
 
-    public function getLikeDislikeMovies($type)
+    public function getLikeDislikeMovies($type, $perPage)
     {
         $user  = JWTAuth::user();
-        $response = $this->likeDislikeRepository->getLikesDislikes($user->id, $type, 20);
+        $response = $this->likeDislikeRepository->getLikesDislikes($user->id, $type, $perPage);
         $movies = $response[0];
 
-        $formattedMovies = $this->formatMovieOptions($movies, $user->id);
+        $formated = [];
+        foreach($movies as $movie){
+            array_push($formated, $movie);
+        }
 
-        return response()->json(new JsonResponse(['movies' => $formattedMovies,'paginator' => $response[1]]));
+        return response()->json(new JsonResponse(['movies' => $formated,'paginator' => $response[1]]));
     }
 
     public function getMostLiked($perPage)
@@ -137,14 +140,9 @@ class MovieController extends Controller
             return response()->json(new JsonResponse($movies));
         }
         else {
-            $ids = $tmdbRepository->findMoviesByName($request->get('movie'), null, $searchRepository);
-            $moviesTmdb = [];
-            if($ids){
-                foreach($ids as $id){
-                    $movieTmdb = $tmdbRepository->getMovie($id);
-                    array_push($moviesTmdb, $movieTmdb['movie']['title']);
-                }
-                return response()->json(new JsonResponse($moviesTmdb));
+            $titles = $tmdbRepository->findMoviesByName($request->get('movie'), null, $searchRepository);
+            if($titles){
+                return response()->json(new JsonResponse($titles));
             }
             else{
                 return response()->json(new JsonResponse(['sucess' => false],'',400),400);

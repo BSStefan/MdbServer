@@ -361,8 +361,10 @@ class TmdbRepository
         $options->includeAdult(false)->year($year);
         $movies = $searchRepository->searchMovie($movie, $options);
 
-        foreach($movies as $movie){
-            return $movie->getId();
+        foreach($movies as $movieOne){
+            if($movieOne->getOriginalTitle() == $movie){
+                return $movieOne->getId();
+            }
         }
 
         return null;
@@ -374,15 +376,12 @@ class TmdbRepository
         $options->includeAdult(false)->year($year);
         $movies = $searchRepository->searchMovie($movie, $options);
 
-        $ids = [];
+        $movieTitles = [];
         foreach($movies as $movie){
-            array_push($ids, $movie->getId());
-            if(count($ids) == 5){
-                return $ids;
-            }
+            array_push($movieTitles, $movie->getTitle());
         }
 
-        return null;
+        return $movieTitles;
     }
 
 }

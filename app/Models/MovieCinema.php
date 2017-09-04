@@ -6,17 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class MovieCinema extends Model
 {
+    public $table = 'movie_cinema';
+
     protected $fillable = [
         'movie_id', 'cinema_id', 'time', 'room', 'url'
     ];
 
     public function movie()
     {
-        $this->belongsTo(Movie::class)->withTimestamps();
+        return $this->belongsTo(Movie::class);
     }
 
     public function cinema()
     {
-        $this->belongsTo(Cinema::class)->withTimestamps();
+        return $this->belongsTo(Cinema::class);
     }
 }

@@ -57,18 +57,22 @@ class WatchMovieRepository extends Repository
         return $movieWatchModel;
     }
 
-    public function getMovies($userId, $field)
+    public function getMovies($userId, $field, $perPage)
     {
         $watchList = $this->model
             ->where('user_id', $userId)
             ->where($field, true)
-            ->get();
+            ->paginate($perPage);
+        $paginator = [
+            'previous_page' => $watchList->previousPageUrl(),
+            'next_page'  => $watchList->nextPageUrl()
+        ];
         $movies = [];
         foreach($watchList as $one){
             $movie = $one->movie;
             $movies[$movie->id] = $movie->getAttributes();
         }
 
-        return $movies;
+        return [$movies, $paginator];
     }
 }

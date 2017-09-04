@@ -18,6 +18,7 @@ class CreateCinemaTable extends Migration
             $table->string('name');
             $table->string('address');
             $table->string('phone');
+            $table->string('city');
             $table->text('crawler_link');
             $table->timestamps();
         });

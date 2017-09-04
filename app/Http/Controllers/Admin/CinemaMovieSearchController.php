@@ -10,6 +10,7 @@ use App\Repositories\Admin\CrawlerRepository;
 use App\Repositories\CinemaRepository;
 use Carbon\Carbon;
 use App\Http\Response\JsonResponse;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class CinemaMovieSearchController extends Controller
 {
@@ -66,5 +67,15 @@ class CinemaMovieSearchController extends Controller
                 'success' => false
             ], 'There was an problem', 400));
         }
+    }
+
+    public function getProjections($id, $city)
+    {
+        $projections = $this->movieCinemaReporitory->findProjections($id, $city);
+
+        return response()->json(new JsonResponse([
+            'success' => true,
+            'projections' => $projections
+        ], '', 200));
     }
 }

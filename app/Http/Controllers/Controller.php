@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Http\Request;
 
 class Controller extends BaseController
 {
@@ -19,7 +20,7 @@ class Controller extends BaseController
         $extension = pathinfo($url,PATHINFO_EXTENSION);
         $fullName =  $path . '/' . md5(microtime()) . '.' . $extension;
         try{
-            $image = Image::make($url)->encode('jpg', 60);
+            $image = Image::make($url)->encode('jpg', 60)->resize(800,1200);
             $image->save(public_path($fullName));
             $saved_image_uri = $image->dirname.'/'.$image->basename;
             $uploaded_thumbnail_image = Storage::putFileAs('public/', new File($saved_image_uri), $fullName);
@@ -33,3 +34,4 @@ class Controller extends BaseController
         return $fullName;
     }
 }
+

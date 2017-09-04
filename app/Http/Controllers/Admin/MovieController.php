@@ -289,7 +289,11 @@ class MovieController extends Controller
             catch(ModelNotFoundException $e){
                 $id = $this->tmdbRepository->findByName($movie, null, $searchRepository);
                 $movieTmdb = $this->tmdbRepository->getMovie($id);
-                $movieModel = $this->saveMovieFromTmdb($movieTmdb);
+                try{
+                    $movieModel = $this->saveMovieFromTmdb($movieTmdb);
+                }
+                catch(\Exception $e) {
+                }
             }
             $likeDislikeRepository->save([
                 'user_id' => $user->id,

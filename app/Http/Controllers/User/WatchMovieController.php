@@ -23,18 +23,21 @@ class WatchMovieController extends Controller
         $this->watchMovieRepository = $watchMovieRepository;
     }
 
-    public function getMovies($type)
+    public function getMovies($type, $perPage)
     {
         $user = JWTAuth::user();
-        $movies = [];
         if($type == 'watchlist') {
-            $movies = $this->watchMovieRepository->getMovies($user->id, 'to_be_watched');
+            $response = $this->watchMovieRepository->getMovies($user->id, 'to_be_watched', $perPage);
         }
         else if($type == 'already'){
-            $movies = $this->watchMovieRepository->getMovies($user->id, 'already_watched');
+            $response = $this->watchMovieRepository->getMovies($user->id, 'already_watched', $perPage);
+        }
+        $formated = [];
+        foreach($response[0] as $movie){
+            array_push($formated, $movie);
         }
 
-        return response()->json(new JsonResponse(['movies' => $movies]));
+        return response()->json(new JsonResponse(['movies' => $formated, 'paginator' => $response[1]]));
     }
 
     public function addMovie(Request $request)

@@ -15,9 +15,10 @@ class MovieCinemaReporitory extends Repository
     {
         $formatedInfo = [];
         foreach($info as $cinemaId => $dates) {
-            foreach($dates as $date) {
+            foreach($dates as $k =>$date) {
                 foreach($date as $infoMovie) {
                     if(isset($moviesTitleIdArray[$infoMovie['title']])) {
+                        $movieFormated['date'] = $k;
                         $movieFormated['movie_id'] = $moviesTitleIdArray[$infoMovie['title']];
                         $movieFormated['cinema_id'] = $cinemaId;
                         $movieFormated['time'] = $infoMovie['time'];
@@ -32,5 +33,23 @@ class MovieCinemaReporitory extends Repository
         }
 
         return DB::table('movie_cinema')->insert($formatedInfo);
+    }
+
+    public function findProjections($id, $city)
+    {
+        $today = new Carbon();
+        $date = $today->toDateString();
+        $projections = $this->model->select('movie_cinema.*', 'cinemas.name')
+            ->join('cinemas', 'movie_cinema.cinema_id', '=', 'cinemas.id')
+            ->where('movie_cinema.movie_id', '=', $id)
+            ->where('cinemas.city', '=', $city)
+            ->where('date', '>=', $date)
+            ->get();
+        $format = [];
+        foreach($projections as $projection){
+            array_push($format, $projection->getAttributes());
+        }
+
+        return $format;
     }
 }
