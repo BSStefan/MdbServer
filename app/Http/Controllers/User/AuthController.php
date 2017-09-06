@@ -134,10 +134,11 @@ class AuthController extends Controller
 
         $user = JWTAuthFacade::user();
         return response()->json(new JsonResponse([
-            'success' => true,
-            'token'   => $token,
+            'success'    => true,
+            'token'      => $token,
             'first_name' => $user->first_name,
-            'last_name'  => $user->last_name
+            'last_name'  => $user->last_name,
+            'is_admin'   => $user->is_admin
         ]));
     }
 
@@ -175,15 +176,17 @@ class AuthController extends Controller
                 'success' => true,
                 'token' => $token,
                 'first_name' => $user->first_name,
-                'last_name' => $user->last_name
+                'last_name' => $user->last_name,
+                'is_admin' => $user->is_admin
             ]));
         }
         else{
             return response()->json(new JsonResponse([
-                'success' => false,
-                'token' => null,
+                'success'    => false,
+                'token'      => null,
                 'first_name' => null,
-                'last_name' => null
+                'last_name'  => null,
+                'is_admin'   => null
             ], 'User is not registered', 200, true));
         }
     }

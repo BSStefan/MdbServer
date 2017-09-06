@@ -93,7 +93,7 @@ class MovieController extends Controller
 
         if($this->saveMovieFromTmdb($movie)){
             return response()->json(new JsonResponse([
-                'movie' => $movie['movie']['title'],
+                'movie' => ['title' => $movie['movie']['title'], 'tmdb_id' =>$movie['movie']['tmdb_id'] ],
                 'success' => true
             ], 'Movie successfully saved', 200));
         }
@@ -141,8 +141,37 @@ class MovieController extends Controller
      */
     public function getTopMoviesFromTmdb($page)
     {
-        return response()->json(new JsonResponse($this->tmdbRepository->getPopularMovies($page)));
+        $popularMovies = $this->tmdbRepository->getPopularMovies($page);
+        $formattedPopularMovies = [];
+        foreach($popularMovies['movies'] as $movie) {
+            $exists = $this->checkIfMovieExists($movie['movie']['tmdb_id'], '');
+            $movie = [
+              'tmdb_id' => $movie['movie']['tmdb_id'],
+              'title'   => $movie['movie']['original_title'],
+              'exists'  => $exists
+            ];
+            array_push($formattedPopularMovies, $movie);
+        }
+
+        return response()->json(new JsonResponse([
+            'movies' => $formattedPopularMovies,
+            'currentPage' => $popularMovies['currentPage'],
+            'totalPages' => $popularMovies['totalPages']
+            ]));
     }
+
+    public function checkIfMovieExists($tmdbId, $title)
+    {
+        $condition = $tmdbId === 0 ? ['original_title', $title] : ['tmdb_id', $tmdbId];
+        try{
+            $this->movieRepository->findBy($condition[0], $condition[1]);
+            return true;
+        }
+        catch(ModelNotFoundException $e) {
+            return false;
+        }
+    }
+
 
     /**
      * Save top movies
@@ -169,7 +198,23 @@ class MovieController extends Controller
      */
     public function getNewestFromTmdb($page)
     {
-        return response()->json(new JsonResponse($this->tmdbRepository->getNowPlayingMovies($page)));
+        $newMovies = $this->tmdbRepository->getNowPlayingMovies($page);
+        $formattedMovies = [];
+        foreach($newMovies['movies'] as $movie) {
+            $exists = $this->checkIfMovieExists($movie['movie']['tmdb_id'], '');
+            $movie = [
+                'tmdb_id' => $movie['movie']['tmdb_id'],
+                'title'   => $movie['movie']['original_title'],
+                'exists'  => $exists
+            ];
+            array_push($formattedMovies, $movie);
+        }
+
+        return response()->json(new JsonResponse([
+            'movies' => $formattedMovies,
+            'currentPage' => $newMovies['currentPage'],
+            'totalPages' => $newMovies['totalPages']
+        ]));
     }
 
     /**

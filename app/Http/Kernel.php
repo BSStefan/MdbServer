@@ -6,6 +6,7 @@ use App\Http\Middleware\EncryptCookies;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use App\Http\Middleware\CorsMiddleware;
+use App\Http\Middleware\AdminApi;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -68,5 +69,6 @@ class Kernel extends HttpKernel
         'auth.api' => \App\Http\Middleware\AuthCheckToken::class,
         'refresh-token' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
         'cors' => CorsMiddleware::class,
+        'auth.api.admin' => AdminApi::class
     ];
 }

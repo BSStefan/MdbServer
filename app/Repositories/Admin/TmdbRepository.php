@@ -152,7 +152,11 @@ class TmdbRepository
             array_push($movies, $this->formatMovie($movie));
         }
 
-        return $movies;
+        return [
+            'movies' => $movies,
+            'totalPages' => $popularMovies->getTotalPages(),
+            'currentPage' => $popularMovies->getPage()
+        ];
     }
 
     /**
@@ -169,7 +173,11 @@ class TmdbRepository
             array_push($movies, $this->formatMovie($movie));
         }
 
-        return $movies;
+        return [
+            'movies'      => $movies,
+            'totalPages'  => $newMovies->getTotalPages(),
+            'currentPage' => $newMovies->getPage()
+        ];
     }
 
     /**

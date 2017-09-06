@@ -37,15 +37,10 @@ class MovieController extends Controller
     {
         $movie = $this->movieRepository->findMovie($id);
         $user  = JWTAuth::user();
-        if(!$user->is_admin){
-            $userReaction = $this->movieRepository->findUserReaction($id, $user->id);
-            return response()->json(new JsonResponse([
-                'movie' => $movie,
-                'user_reaction' => $userReaction
-            ]));
-        }
+        $userReaction = $this->movieRepository->findUserReaction($id, $user->id);
         return response()->json(new JsonResponse([
-            'movie' => null
+            'movie' => $movie,
+            'user_reaction' => $userReaction
         ]));
     }
 
