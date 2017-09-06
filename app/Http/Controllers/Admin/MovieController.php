@@ -261,6 +261,55 @@ class MovieController extends Controller
         return response()->json(new JsonResponse($response));
     }
 
+    public function getCurrentMoviesInCinema()
+    {
+        $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
+        $formattedMovies = [];
+        foreach($movies as $movie) {
+            $exists = $this->checkIfMovieExists(0, $movie);
+            $movieOne = [
+                'tmdb_id' => 0,
+                'title'   => $movie,
+                'exists'  => $exists
+            ];
+            array_push($formattedMovies, $movieOne);
+        }
+
+        return response()->json(new JsonResponse([
+            'movies' => $formattedMovies,
+            'currentPage' => 1,
+            'totalPages' => 1
+        ]));
+    }
+
+    public function addCurrentMovieInCinema(Request $request, SearchRepository $searchRepository)
+    {
+        $this->validate($request,[
+            'title' => 'required'
+        ]);
+        try{
+            $id = $this->tmdbRepository->findByName($request->title, Carbon::today()->year, $searchRepository);
+            $movieTmdb = $this->tmdbRepository->getMovie($id);
+            $movieModel = $this->movieRepository->findBy('tmdb_id', $id);
+            var_dump($movieModel);
+        }
+        catch(ModelNotFoundException $e){
+            $movieModel = $this->saveMovieFromTmdb($movieTmdb);
+        }
+        catch(\Exception $e){
+            return response()->json(new JsonResponse([
+                'movie' => ['title' => null, 'tmdb_id' => null],
+                'success' => false
+            ], 'There was an error', 200));
+        }
+
+        return response()->json(new JsonResponse([
+            'movie' => ['title' => $movieModel->title, 'tmdb_id' => $movieModel->tmdb_id ],
+            'success' => true
+        ], 'Movie successfully saved', 200));
+
+    }
+
     /**
      * Find current movie in cinema and save them
      *
@@ -274,13 +323,9 @@ class MovieController extends Controller
 
         $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
 
-        $i = 0;
         $response = [];
         foreach($movies as $movie) {
-            $i++;
-            if($i>20) {
-                return response()->json(new JsonResponse($response));
-            }
+            $error = false;
             try{
                 $movieModel = $this->movieRepository->findBy('original_title', $movie);
             }
@@ -289,27 +334,28 @@ class MovieController extends Controller
             }
             if(!$movieModel){
                 try{
-                    $id = $this->tmdbRepository->findByName($movie, Carbon::today()->year, $searchRepository);
-                    $movieTmdb = $this->tmdbRepository->getMovie($id);
+                    $id         = $this->tmdbRepository->findByName($movie, Carbon::today()->year, $searchRepository);
+                    $movieTmdb  = $this->tmdbRepository->getMovie($id);
                     $movieModel = $this->movieRepository->findBy('tmdb_id', $id);
                 }
                 catch(ModelNotFoundException $e){
                     $movieModel = $this->saveMovieFromTmdb($movieTmdb);
                 }
                 catch(\Exception $e){
-                    $response[$movie] = false;
+                    array_push($response, ['title' => $movie, 'status' => false]);
+                    $error=true;
                 }
             }
-            if(!isset($response[$movie])){
+            if(!$error){
                 $movieModel->in_cinema = true;
 
                 $movieModel = $this->movieRepository->save($movieModel->getAttributes(), $movieModel->id);
 
                 if($movieModel){
-                    $response[$movie] = true;
+                    array_push($response, ['title' => $movie, 'status' => true]);
                 }
                 else{
-                    $response[$movie] = false;
+                    array_push($response, ['title' => $movie, 'status' => false]);
                 }
             }
         }

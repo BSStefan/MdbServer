@@ -123,4 +123,9 @@ abstract class Repository implements RepositoryInterface
     {
         return $this->model->where($field, '=', $value)->get($columns);
     }
+
+    public function count()
+    {
+        return $this->model->all()->count();
+    }
 }

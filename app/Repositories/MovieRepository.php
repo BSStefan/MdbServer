@@ -16,9 +16,8 @@ class MovieRepository extends Repository
         $moviesTitleIdArray = [];
 
         foreach($movies as $movie) {
-            $moviesTitleIdArray[$movie->title] = $movie->id;
+            $moviesTitleIdArray[$movie->original_title] = $movie->id;
         }
-
         return $moviesTitleIdArray;
     }
 

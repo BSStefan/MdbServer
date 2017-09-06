@@ -53,8 +53,8 @@ class CinemaMovieSearchController extends Controller
 
     public function findTimeCurrentMoviesInCinema()
     {
+        $this->movieCinemaReporitory->deleteAll();
         $currentMoviesTitleId = $this->movieRepository->findCurrentInCinema();
-
         $weekInformation      = $this->findTimesCurrentMovies();
 
         if($this->movieCinemaReporitory->saveNewMoviesInCinema($currentMoviesTitleId, $weekInformation)) {

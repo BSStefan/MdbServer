@@ -16,10 +16,12 @@ Route::group(['middleware' => 'cors'], function (){
             Route::get('upcoming-movies/{page}', 'Admin\MovieController@getUpcomingFromTmdb')->name('admin.tmdb.upcoming-movies');
             Route::get('get-images/{page}', 'Admin\StartController@getTopImage');
         });
+        Route::get('info', 'Admin\StartController@getInfo');
         Route::group(['prefix' => 'crawler'], function (){
-            Route::get('current-movies', 'Admin\MovieController@getCurrentMoviesInCinema')->name('admin.crawler.current-movies');
+            Route::get('current-in-cinema/{page}', 'Admin\MovieController@getCurrentMoviesInCinema')->name('admin.crawler.current-movies-show');
             Route::post('current-movies', 'Admin\MovieController@findCurrentMoviesInCinema')->name('admin.crawler.current-movies');
-            Route::get('current-movies-time', 'Admin\CinemaMovieSearchController@findTimeCurrentMoviesInCinema')->name('admin.crawler.time-current-movies');
+            Route::post('current-movie', 'Admin\MovieController@addCurrentMovieInCinema')->name('admin.crawler.current-movie');
+            Route::post('current-movies-time', 'Admin\CinemaMovieSearchController@findTimeCurrentMoviesInCinema')->name('admin.crawler.time-current-movies');
         });
     });
     Route::group(['prefix' => 'auth'], function (){

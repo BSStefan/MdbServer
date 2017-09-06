@@ -123,7 +123,7 @@ class CrawlerRepository
                         $aTags = $childDiv->getElementsByTagName('a');
                         foreach($aTags as $a){
                             $movieTime        = [
-                                'title'  => $movieTitle,
+                                'title'  => utf8_decode($movieTitle),
                                 'cinema' => $cinema,
                                 'date'   => $date
                             ];

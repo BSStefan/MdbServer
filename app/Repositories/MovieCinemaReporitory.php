@@ -52,4 +52,9 @@ class MovieCinemaReporitory extends Repository
 
         return $format;
     }
+
+    public function deleteAll()
+    {
+        DB::table('movie_cinema')->truncate();
+    }
 }
