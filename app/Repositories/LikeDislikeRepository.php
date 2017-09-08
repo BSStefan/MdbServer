@@ -59,4 +59,18 @@ class LikeDislikeRepository extends Repository
         return [$moviesFormatted, $paginator];
     }
 
+    public function getAllLikes($userId)
+    {
+        $movies = $this->model->select()
+            ->where('user_id', '=', $userId)
+            ->where('is_like', '=', true)
+            ->get();
+
+        $formatted = [];
+        foreach($movies as $movie){
+            array_push($formatted, $movie->movie_id);
+        }
+        return $formatted;
+    }
+
 }

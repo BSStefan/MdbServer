@@ -24,6 +24,10 @@ use Tmdb\Client;
 use Tmdb\Repository\SearchRepository;
 use App\Repositories\Eloquent\Repository;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Repositories\UserCoefficientRepository;
+use App\Repositories\UserRecommendationRepository;
+use App\Helpers\FindSimilarlyMovies;
+use App\Helpers\FormatMarks;
 
 class MovieController extends Controller
 {
@@ -363,7 +367,11 @@ class MovieController extends Controller
         return response()->json(new JsonResponse($response));
     }
 
-    public function registerUserMovies(Request $request, LikeDislikeRepository $likeDislikeRepository, SearchRepository $searchRepository)
+    public function registerUserMovies(
+        Request $request,
+        LikeDislikeRepository $likeDislikeRepository,
+        SearchRepository $searchRepository
+    )
     {
         $this->validate($request, [
             'movie1' => 'required|min:3',
@@ -372,10 +380,11 @@ class MovieController extends Controller
         ]);
 
         $user = JWTAuth::user();
+        $likedMovies = [];
 
         foreach($request->all() as $movie){
             try{
-                $movieModel = $this->movieRepository->findBy('title', $movie);
+                $movieModel = $this->movieRepository->findBy('original_title', $movie);
             }
             catch(ModelNotFoundException $e){
                 $id = $this->tmdbRepository->findByName($movie, null, $searchRepository);
@@ -386,6 +395,7 @@ class MovieController extends Controller
                 catch(\Exception $e) {
                 }
             }
+            array_push($likedMovies, $movieModel->id);
             $likeDislikeRepository->save([
                 'user_id' => $user->id,
                 'movie_id' => $movieModel->id,
@@ -393,7 +403,32 @@ class MovieController extends Controller
             ]);
         }
 
+        $findRecommendation = $this->userModelFirst($likedMovies, $user);
+
         return response()->json(new JsonResponse(['success' => true]));
+    }
+    /*
+     * Find recommendation at the beginning
+     *
+     */
+    private function userModelFirst(array $moviesArray, $user)
+    {
+        $userCoefficientRepository = resolve(UserCoefficientRepository::class);
+        $movieModelRepository = resolve(MovieModelRepository::class);
+        $userRecommendationRepository = resolve(UserRecommendationRepository::class);
+        $coefficients = $userCoefficientRepository->findBy('user_id', $user->id);
+        $otherMovies = $movieModelRepository->getNotInArray($moviesArray);
+        $similarity = [];
+        foreach($moviesArray as $movieId) {
+            $movieModel = $movieModelRepository->findBy('movie_id',$movieId);
+            $similarMovies = FindSimilarlyMovies::findSimilarMovies($movieModel, $otherMovies, $coefficients);
+            $similarity[$movieId] = $similarMovies;
+        }
+
+        $similarity = FormatMarks::formatFromMultipleArrays($similarity);
+        $lastMovie = $movieModelRepository->findLast();
+
+        return $userRecommendationRepository->saveNewRecommendation($user->id, $similarity, $lastMovie->movie_id);
     }
 
     /**

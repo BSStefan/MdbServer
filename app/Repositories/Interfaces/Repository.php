@@ -17,4 +17,6 @@
         public function findBy($field, $value, $columns);
 
         public function count();
+
+        public function whereIn(array $array);
     }

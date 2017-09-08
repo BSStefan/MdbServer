@@ -170,4 +170,9 @@ class MovieRepository extends Repository
 
         return $moviesFormated;
     }
+
+    public function findRecommendation($perPage, $array)
+    {
+        return $this->model->whereIn('id', $array)->paginate($perPage);
+    }
 }

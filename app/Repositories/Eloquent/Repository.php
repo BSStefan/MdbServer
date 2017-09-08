@@ -128,4 +128,9 @@ abstract class Repository implements RepositoryInterface
     {
         return $this->model->all()->count();
     }
+
+    public function whereIn(array $array)
+    {
+        return $this->model->whereIn('id', $array)->get();
+    }
 }

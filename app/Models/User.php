@@ -58,4 +58,30 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(LikeDislike::class);
     }
+
+    public function onlyLiked()
+    {
+        return $this->hasMany(LikeDislike::class)->where('is_like', '=', true)->select('movie_id');
+    }
+
+    public function onlyDisliked()
+    {
+        return $this->hasMany(LikeDislike::class)->where('is_like', '=', false);
+    }
+
+    public function watched()
+    {
+        return $this->hasMany(WatchMovie::class)->where('already_watched', '=', true);
+    }
+
+    public function coefficients()
+    {
+        return $this->hasOne(UserCoefficient::class);
+    }
+
+    public function recommendation()
+    {
+        return $this->hasOne(UserRecommendation::class);
+    }
 }
+

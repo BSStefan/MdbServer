@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Helpers\FindSimilarlyMovies;
+use App\Helpers\FormatCoefficients;
+use App\Helpers\FormatMarks;
 use App\Http\Response\JsonResponse;
 use App\Repositories\LikeDislikeRepository;
+use App\Repositories\MovieModelRepository;
 use App\Repositories\MovieRepository;
+use App\Repositories\UserCoefficientRepository;
+use App\Repositories\UserRecommendationRepository;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -22,18 +29,30 @@ class LikeDislikeController extends Controller
      */
     private $movieRepository;
 
+    private $userCoefficientRepository;
+    private $movieModelRepository;
+    private $userRecommendationRepository;
+
+
     public function __construct(
         LikeDislikeRepository $likeDislikeRepository,
-        MovieRepository $movieRepository
+        MovieRepository $movieRepository,
+        UserCoefficientRepository $userCoefficientRepository,
+        MovieModelRepository $movieModelRepository,
+        UserRecommendationRepository $userRecommendationRepository
     )
     {
-        $this->likeDislikeRepository = $likeDislikeRepository;
-        $this->movieRepository = $movieRepository;
+        $this->likeDislikeRepository        = $likeDislikeRepository;
+        $this->movieRepository              = $movieRepository;
+        $this->userRecommendationRepository = $userRecommendationRepository;
+        $this->movieModelRepository         = $movieModelRepository;
+        $this->userCoefficientRepository    = $userCoefficientRepository;
     }
 
     public function likeDislikeMovie(Request $request)
     {
         $user  = JWTAuth::user();
+
         try{
             $movie = $this->movieRepository->find($request->input('movie_id'));
         }
@@ -75,6 +94,15 @@ class LikeDislikeController extends Controller
                 'is_like'  => $request->is_like
             ]);
         }
+        if($likeDislike) {
+            $this->createUserCoefficients($user);
+            if($likeDislike->is_like){
+                $this->likedMovieFindSimilar($likeDislike->movie_id, $user);
+            }
+            else {
+                $this->dislikeMovieFindSimilar($likeDislike->movie_id, $user);
+            }
+        }
 
         if($likeDislike){
             $like       = $likeDislike->is_like ? true : false;
@@ -95,4 +123,54 @@ class LikeDislikeController extends Controller
             return response()->json(new JsonResponse(['success' => false, 'like_dislike' => null]), 400);
         }
     }
+
+    private function likedMovieFindSimilar($id, $user)
+    {
+        $movieModel = $this->movieModelRepository->findBy('movie_id', $id);
+        $otherMovieModels = $this->movieModelRepository->getOthersExceptLikedAndDislikedWatched($user->likes, $user->watched);
+        $coefficients = $this->userCoefficientRepository->findBy('user_id', $user->id);
+        $similarMovies = FindSimilarlyMovies::findSimilarMovies($movieModel, $otherMovieModels, $coefficients);
+        $userRecommendation = $this->userRecommendationRepository->findBy('user_id', $user->id);
+
+        $newRecommendation = FormatMarks::formatFromMultipleArrays([$similarMovies, $userRecommendation->movies]);
+
+        return $this->userRecommendationRepository
+            ->saveNewRecommendation($user->id, $newRecommendation, $userRecommendation->last_movie_calculated, $userRecommendation->id);
+    }
+
+    private function dislikeMovieFindSimilar($id, $user)
+    {
+        $movieModel = $this->movieModelRepository->findBy('movie_id', $id);
+        $otherMovieModels = $this->movieModelRepository->getOthersExceptLikedAndDislikedWatched($user->likes, $user->watched);
+        $coefficients = $this->userCoefficientRepository->findBy('user_id', $user->id);
+        $similarMovies = FindSimilarlyMovies::findSimilarMovies($movieModel, $otherMovieModels, $coefficients);
+        $userRecommendation = $this->userRecommendationRepository->findBy('user_id', $user->id);
+        $newRecommendation = FormatMarks::formatDislikeFromMultipleArrays($userRecommendation->movies, $similarMovies, $movieModel);
+
+        return $this->userRecommendationRepository
+            ->saveNewRecommendation($user->id, $newRecommendation, $userRecommendation->last_movie_calculated, $userRecommendation->id);
+    }
+
+    private function createUserCoefficients($user)
+    {
+        $likedDislikedIds = [];
+        foreach($user->likes as $one) {
+            array_push($likedDislikedIds, $one->movie_id);
+        }
+        $userCoefficients = $user->coefficients;
+        $likedDisliked = $this->movieModelRepository->findInArray($likedDislikedIds);
+
+        $newCoefficientResponse = FormatCoefficients::formatUserCoefficients($likedDisliked, $userCoefficients);
+        if($newCoefficientResponse[0]) {
+            $this->userCoefficientRepository->save($newCoefficientResponse[1], $userCoefficients->id);
+        }
+        return true;
+    }
+
+    //private function test($user){
+    //    $recommendation = $user->recommendation;
+    //
+    //    dd(Carbon::createFromFormat('Y-m-d H:i:s',$recommendation->last_updated)->addDays(2)->greaterThan(Carbon::now()));
+    //
+    //}
 }

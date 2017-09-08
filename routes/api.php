@@ -45,6 +45,7 @@ Route::group(['middleware' => 'cors'], function (){
         Route::post('like-dislike', 'User\LikeDislikeController@likeDislikeMovie');
         Route::get('like-dislike/{type}/{perPage}', 'User\MovieController@getLikeDislikeMovies');
         Route::get('most-liked/{perPage}', 'User\MovieController@getMostLiked');
+        Route::get('recommendation/{perPage}', 'User\MovieController@getRecommendation');
         Route::get('watched-to-be-watched/{type}/{perPage}', 'User\WatchMovieController@getMovies');
         Route::post('watched-to-be-watched', 'User\WatchMovieController@addMovie');
         Route::get('new-movies/{perPage}', 'User\MovieController@getNewMovies');
@@ -56,6 +57,10 @@ Route::group(['middleware' => 'cors'], function (){
             Route::put('update', 'User\UserController@updateInfo');
             Route::put('update-password', 'User\UserController@updatePassword');
         });
+        //test rute
+        Route::get('test', 'Controller@test1');
+        Route::get('like/{id}', 'Controller@likedMovieFindSimilar');
+        Route::post('like', 'Controller@test2');
     });
     Route::get('search-movie', 'User\MovieController@getSearchMovie');
 
@@ -63,7 +68,7 @@ Route::group(['middleware' => 'cors'], function (){
 });
 
 
-//Route::get('seeder', 'SeederController@getInfo');
+Route::get('test', 'Admin\MovieModelController@setUp');
 
 
 

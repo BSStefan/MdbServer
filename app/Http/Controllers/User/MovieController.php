@@ -145,5 +145,26 @@ class MovieController extends Controller
         }
     }
 
+    public function getRecommendation($perPage)
+    {
+        $user = JWTAuth::user();
+        $moviesIds = array_slice($user->recommendation->movies, 0, $perPage, true);
+        $moviesModels = $this->movieRepository->whereIn(array_keys($moviesIds));
+        $formattedMovies = [];
+        foreach($moviesIds as $moviesId => $mark){
+            foreach($moviesModels as $one){
+                if($one->id == $moviesId){
+                    $userReaction = $this->movieRepository->findUserReaction($moviesId, $user->id);
+                    array_push($formattedMovies, [
+                        'movie'=>$one->getAttributes(),
+                        'user_reaction' => $userReaction
+                    ]);
+                    continue;
+                }
+            }
+        }
+        return response()->json(new JsonResponse(['movies' => $formattedMovies]));
+    }
+
 
 }

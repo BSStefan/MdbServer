@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Response\JsonResponse;
 use App\Repositories\MovieRepository;
+use App\Repositories\UserRecommendationRepository;
 use App\Repositories\WatchMovieRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -13,14 +14,17 @@ class WatchMovieController extends Controller
 {
     private $movieRepository;
     private $watchMovieRepository;
+    private $userRecommendationRepository;
 
     public function __construct(
         MovieRepository $movieRepository,
-        WatchMovieRepository $watchMovieRepository
+        WatchMovieRepository $watchMovieRepository,
+        UserRecommendationRepository $userRecommendationRepository
     )
     {
         $this->movieRepository      = $movieRepository;
         $this->watchMovieRepository = $watchMovieRepository;
+        $this->userRecommendationRepository = $userRecommendationRepository;
     }
 
     public function getMovies($type, $perPage)
@@ -49,6 +53,9 @@ class WatchMovieController extends Controller
         $user = JWTAuth::user();
         $movie = $this->movieRepository->find($request->input('movie_id'));
         $watchMovie = $this->watchMovieRepository->addToList($movie->id, $user->id, $request->input('to_be_watched'));
+        if($watchMovie && $watchMovie->already_watched){
+            $this->deleteMovieFromRecommendations($watchMovie->movie_id, $user);
+        }
         if($watchMovie){
             return response()->json(new JsonResponse([
                 'success' => true,
@@ -63,5 +70,16 @@ class WatchMovieController extends Controller
             'to_be_watched' => null,
             'already_watched' => null
         ], '', 400), 400);
+    }
+
+    private function deleteMovieFromRecommendations($id, $user)
+    {
+        $userRecommendation = $this->userRecommendationRepository->findBy('user_id', $user->id);
+        $movies = $userRecommendation->movies;
+        if(isset($movies[$id])){
+            unset($movies[$id]);
+        }
+
+        return $this->userRecommendationRepository->updateRecommendation($userRecommendation->id, $movies);
     }
 }
