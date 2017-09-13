@@ -17,19 +17,19 @@ class CinemaMovieSearchController extends Controller
     protected $crawlerRepository;
     protected $cinemaRepository;
     protected $movieRepository;
-    protected $movieCinemaReporitory;
+    protected $movieCinemaRepository;
 
     public function __construct(
         CrawlerRepository $crawlerRepository,
         CinemaRepository $cinemaRepository,
         MovieRepository $movieRepository,
-        MovieCinemaReporitory $movieCinemaReporitory
+        MovieCinemaReporitory $movieCinemaRepository
     )
     {
         $this->crawlerRepository     = $crawlerRepository;
         $this->cinemaRepository      = $cinemaRepository;
         $this->movieRepository       = $movieRepository;
-        $this->movieCinemaReporitory = $movieCinemaReporitory;
+        $this->movieCinemaRepository = $movieCinemaRepository;
     }
 
     public function findTimesCurrentMovies()
@@ -53,16 +53,16 @@ class CinemaMovieSearchController extends Controller
 
     public function findTimeCurrentMoviesInCinema()
     {
-        $this->movieCinemaReporitory->deleteAll();
+        $this->movieCinemaRepository->deleteAll();
         $currentMoviesTitleId = $this->movieRepository->findCurrentInCinema();
         $weekInformation      = $this->findTimesCurrentMovies();
 
-        if($this->movieCinemaReporitory->saveNewMoviesInCinema($currentMoviesTitleId, $weekInformation)) {
+        if($this->movieCinemaRepository->saveNewMoviesInCinema($currentMoviesTitleId, $weekInformation)){
             return response()->json(new JsonResponse([
                 'success' => true
             ], '', 200));
         }
-        else {
+        else{
             return response()->json(new JsonResponse([
                 'success' => false
             ], 'There was an problem', 400));
@@ -71,10 +71,10 @@ class CinemaMovieSearchController extends Controller
 
     public function getProjections($id, $city)
     {
-        $projections = $this->movieCinemaReporitory->findProjections($id, $city);
+        $projections = $this->movieCinemaRepository->findProjections($id, $city);
 
         return response()->json(new JsonResponse([
-            'success' => true,
+            'success'     => true,
             'projections' => $projections
         ], '', 200));
     }

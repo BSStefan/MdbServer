@@ -147,7 +147,7 @@ class MovieController extends Controller
 
     public function getRecommendation($perPage)
     {
-        $user = JWTAuth::user();
+        $user = JWTAuth::user(); 
         $moviesIds = array_slice($user->recommendation->movies, 0, $perPage, true);
         $moviesModels = $this->movieRepository->whereIn(array_keys($moviesIds));
         $formattedMovies = [];

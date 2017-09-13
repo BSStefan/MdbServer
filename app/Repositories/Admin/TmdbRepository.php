@@ -134,7 +134,11 @@ class TmdbRepository
             array_push($movies, $this->formatMovie($movie));
         }
 
-        return $movies;
+        return [
+            'movies' => $movies,
+            'totalPages' => $popularMovies->getTotalPages(),
+            'currentPage' => $popularMovies->getPage()
+        ];
     }
 
     /**
@@ -227,12 +231,10 @@ class TmdbRepository
     /**
      * Find all genres
      *
-     * @var GenreRepository $genreRepository
      * @return array
      */
     public function getGenres()
     {
-
         $genreList = $this->genreRepository->loadMovieCollection();
 
         return $this->formatSimpleCollection($genreList);

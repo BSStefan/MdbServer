@@ -13,26 +13,26 @@ class MovieCinemaReporitory extends Repository
 
     public function saveNewMoviesInCinema($moviesTitleIdArray, $info)
     {
-        $formatedInfo = [];
+        $formattedInfo = [];
         foreach($info as $cinemaId => $dates) {
             foreach($dates as $k =>$date) {
                 foreach($date as $infoMovie) {
                     if(isset($moviesTitleIdArray[$infoMovie['title']])) {
-                        $movieFormated['date'] = $k;
-                        $movieFormated['movie_id'] = $moviesTitleIdArray[$infoMovie['title']];
-                        $movieFormated['cinema_id'] = $cinemaId;
-                        $movieFormated['time'] = $infoMovie['time'];
-                        $movieFormated['room'] = $infoMovie['room'];
-                        $movieFormated['url'] = $infoMovie['url'];
-                        $movieFormated['created_at'] = Carbon::now()->toDateTimeString();
-                        $movieFormated['updated_at'] = Carbon::now()->toDateTimeString();
-                        array_push($formatedInfo, $movieFormated);
+                        $movieFormatted['date'] = $k;
+                        $movieFormatted['movie_id'] = $moviesTitleIdArray[$infoMovie['title']];
+                        $movieFormatted['cinema_id'] = $cinemaId;
+                        $movieFormatted['time'] = $infoMovie['time'];
+                        $movieFormatted['room'] = $infoMovie['room'];
+                        $movieFormatted['url'] = $infoMovie['url'];
+                        $movieFormatted['created_at'] = Carbon::now()->toDateTimeString();
+                        $movieFormatted['updated_at'] = Carbon::now()->toDateTimeString();
+                        array_push($formattedInfo, $movieFormatted);
                     }
                 }
             }
         }
 
-        return DB::table('movie_cinema')->insert($formatedInfo);
+        return DB::table('movie_cinema')->insert($formattedInfo);
     }
 
     public function findProjections($id, $city)

@@ -9,13 +9,12 @@ class UserCoefficientRepository extends Repository
 {
     protected $modelClass = UserCoefficient::class;
 
-    //TODO promeni koeficijente
     public function setToDefault($userId)
     {
         return $this->save([
             'user_id'  => $userId,
-            'director' => 1,
-            'actors'   => 1,
+            'director' => 2,
+            'actors'   => 3,
             'writers'  => 1,
             'genres'   => 1,
             'keywords' => 1

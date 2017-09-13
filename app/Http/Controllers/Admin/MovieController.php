@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Response\JsonResponse;
 use App\Models\Director;
 use App\Models\Movie;
+use App\Models\User;
 use App\Models\Writer;
 use App\Repositories\ActorRepository;
 use App\Repositories\Admin\CrawlerRepository;
@@ -265,6 +266,12 @@ class MovieController extends Controller
         return response()->json(new JsonResponse($response));
     }
 
+
+    /**
+     * Find current in cinema
+     *
+     * @return JsonResponse
+     */
     public function getCurrentMoviesInCinema()
     {
         $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
@@ -295,7 +302,7 @@ class MovieController extends Controller
             $id = $this->tmdbRepository->findByName($request->title, Carbon::today()->year, $searchRepository);
             $movieTmdb = $this->tmdbRepository->getMovie($id);
             $movieModel = $this->movieRepository->findBy('tmdb_id', $id);
-            var_dump($movieModel);
+            //var_dump($movieModel);
         }
         catch(ModelNotFoundException $e){
             $movieModel = $this->saveMovieFromTmdb($movieTmdb);
@@ -326,7 +333,6 @@ class MovieController extends Controller
         $this->movieRepository->restartCurrentInCinema();
 
         $movies = $this->crawlerRepository->findTitles('http://www.cineplexx.rs/filmovi/u-bioskopu');
-
         $response = [];
         foreach($movies as $movie) {
             $error = false;
@@ -366,7 +372,15 @@ class MovieController extends Controller
 
         return response()->json(new JsonResponse($response));
     }
-
+    /**
+     * Save liked movies and find recommendations
+     *
+     * @param Request $request
+     * @param LikeDislikeRepository $likeDislikeRepository
+     * @param SearchRepository $searchRepository
+     *
+     * @return JsonResponse
+     */
     public function registerUserMovies(
         Request $request,
         LikeDislikeRepository $likeDislikeRepository,
@@ -407,9 +421,14 @@ class MovieController extends Controller
 
         return response()->json(new JsonResponse(['success' => true]));
     }
-    /*
-     * Find recommendation at the beginning
+
+    /**
+     * Find and save first recommendation
      *
+     * @param array $moviesArray
+     * @param User $user
+     *
+     * @return JsonResponse
      */
     private function userModelFirst(array $moviesArray, $user)
     {
@@ -564,19 +583,19 @@ class MovieController extends Controller
         switch($person['role']){
             case 'actor':
                 $person['image_url'] = $person['image_url'] ?
-                    $this->saveImageFromUrl($person['image_url'], 'images/actors') : 'No image';
+                    $this->saveImageFromUrl($person['image_url'], 'images/actors') : 'images/default.jpg';
                 unset($person['role']);
 
                 return $this->actorRepository->save($person);
             case 'director':
                 $person['image_url'] = $person['image_url'] ?
-                    $this->saveImageFromUrl($person['image_url'], 'images/directors') : 'No image';
+                    $this->saveImageFromUrl($person['image_url'], 'images/directors') : 'images/default.jpg';
                 unset($person['role']);
 
                 return $this->directorRepository->save($person);
             case 'writer':
                 $person['image_url'] = $person['image_url'] ?
-                    $this->saveImageFromUrl($person['image_url'], 'images/writers') : 'No image';
+                    $this->saveImageFromUrl($person['image_url'], 'images/writers') : 'images/default.jpg';
                 unset($person['role']);
 
                 return $this->writerRepository->save($person);

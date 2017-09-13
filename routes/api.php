@@ -1,6 +1,5 @@
 <?php
 
-//Admin
 Route::group(['middleware' => 'cors'], function (){
     Route::group(['prefix' => 'admin', 'middleware' => 'auth.api.admin'], function (){
         Route::group(['prefix' => 'tmdb'], function (){
@@ -57,18 +56,11 @@ Route::group(['middleware' => 'cors'], function (){
             Route::put('update', 'User\UserController@updateInfo');
             Route::put('update-password', 'User\UserController@updatePassword');
         });
-        //test rute
-        Route::get('test', 'Controller@test1');
-        Route::get('like/{id}', 'Controller@likedMovieFindSimilar');
-        Route::post('like', 'Controller@test2');
     });
     Route::get('search-movie', 'User\MovieController@getSearchMovie');
-
     Route::get('image', 'Web\ImageController@getImage');
 });
 
-
-Route::get('test', 'Admin\MovieModelController@setUp');
 
 
 

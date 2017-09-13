@@ -47,19 +47,15 @@ class MovieRepository extends Repository
 
         foreach($actorsModels as $actor){
             array_push($actors, ['id' => $actor->id, 'name' => $actor->name]);
-            //$actors[$actor->id] = $actor->name;
         }
         foreach($writersModels as $writer){
             array_push($writers, ['id' => $writer->id, 'name' => $writer->name]);
-            //$writers[$writer->id] = $writer->name;
         }
         foreach($genresModels as $genre){
             array_push($genres, ['id' => $genre->id, 'name' => $genre->name]);
-            //$genres[$genre->id] = $genre->name;
         }
         foreach($keywordsModels as $keyword){
             array_push($keywords, ['id' => $keyword->id, 'word' => $keyword->word]);
-            //$keywords[$keyword->id] = $keyword->word;
         }
         $director[$directorModel->id] = $directorModel->name;
 

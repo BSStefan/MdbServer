@@ -6,6 +6,7 @@ use App\Helpers\FindSimilarlyMovies;
 use App\Helpers\FormatCoefficients;
 use App\Helpers\FormatMarks;
 use App\Http\Response\JsonResponse;
+use App\Models\UserRecommendation;
 use App\Repositories\LikeDislikeRepository;
 use App\Repositories\MovieModelRepository;
 use App\Repositories\MovieRepository;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
 
 class LikeDislikeController extends Controller
 {
@@ -124,6 +126,14 @@ class LikeDislikeController extends Controller
         }
     }
 
+    /**
+     * Update user recommendation
+     *
+     * @param int $id
+     * @param User $user
+     *
+     * @return UserRecommendation
+     */
     private function likedMovieFindSimilar($id, $user)
     {
         $movieModel = $this->movieModelRepository->findBy('movie_id', $id);
@@ -138,6 +148,14 @@ class LikeDislikeController extends Controller
             ->saveNewRecommendation($user->id, $newRecommendation, $userRecommendation->last_movie_calculated, $userRecommendation->id);
     }
 
+    /**
+     * Update user recommendation
+     *
+     * @param int $id
+     * @param User $user
+     *
+     * @return UserRecommendation
+     */
     private function dislikeMovieFindSimilar($id, $user)
     {
         $movieModel = $this->movieModelRepository->findBy('movie_id', $id);
@@ -151,6 +169,13 @@ class LikeDislikeController extends Controller
             ->saveNewRecommendation($user->id, $newRecommendation, $userRecommendation->last_movie_calculated, $userRecommendation->id);
     }
 
+    /**
+     * Update user coefficients
+     *
+     * @param User $user
+     *
+     * @return UserRecommendation
+     */
     private function createUserCoefficients($user)
     {
         $likedDislikedIds = [];

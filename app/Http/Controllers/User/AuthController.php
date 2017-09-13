@@ -143,7 +143,9 @@ class AuthController extends Controller
         }
 
         $user = JWTAuthFacade::user();
-        $this->checkRecommendation($user);
+        if(!$user->is_admin){
+            $this->checkRecommendation($user);
+        }
         return response()->json(new JsonResponse([
             'success'    => true,
             'token'      => $token,
@@ -180,6 +182,7 @@ class AuthController extends Controller
             'password'   => $request->password,
             'city'       => $request->city
         ]);
+
         if($user){
             $token = $this->jwt->fromUser($user);
             $coefficients = $this->userCoefficientRepository->setToDefault($user->id);
@@ -260,7 +263,10 @@ class AuthController extends Controller
         $movieModelRepository = resolve(MovieModelRepository::class);
         $userRecommendationRepository = resolve(UserRecommendationRepository::class);
         $lastMovieId = intval($movieModelRepository->findLast()->movie_id);
-        if(($lastMovieId-intval($userRecommendation->last_movie_calculated)) > -1 || Carbon::createFromFormat('Y-m-d H:i:s', $userRecommendation->last_updated)->addDays(2)->lessThan(Carbon::now())) {
+        if(
+            ($lastMovieId-intval($userRecommendation->last_movie_calculated)) > 5
+            || Carbon::createFromFormat('Y-m-d H:i:s', $userRecommendation->last_updated)->addDays(2)->lessThan(Carbon::now())
+        ) {
             $likedMovies = [];
             $liked = $user->onlyLiked;
             foreach($liked as $one){
@@ -294,9 +300,9 @@ class AuthController extends Controller
 
             $new = FormatMarks::formatLikeDislikeUpdateAll($similarityLiked, $similarityDisliked);
             $updated =$userRecommendationRepository->saveNewRecommendation($user->id, $new, $lastMovieId,$userRecommendation->id, true);
-            dd($updated);
+            return $updated;
         }
-
+        return $userRecommendation;
 
     }
 

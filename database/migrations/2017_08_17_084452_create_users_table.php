@@ -34,6 +34,8 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('user_recommendations');
+        Schema::dropIfExists('user_coefficients');
         Schema::dropIfExists('watch_movies');
         Schema::dropIfExists('user_providers');
         Schema::dropIfExists('users');

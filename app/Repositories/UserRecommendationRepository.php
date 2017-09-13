@@ -44,9 +44,4 @@ class UserRecommendationRepository extends Repository
             'movies' => $recommendationString,
         ], $recommendationId);
     }
-
-    public function updateAllRecommendation($recommendationId, $newRecommendation)
-    {
-
-    }
 }

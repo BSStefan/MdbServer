@@ -1441,16 +1441,16 @@
         },
         {
             "name": "php-tmdb/laravel",
-            "version": "v1.1.0",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-tmdb/laravel.git",
-                "reference": "4fec330c81a62611d1abd895071d34bc405217c6"
+                "reference": "12924a77d9ba631045e23b8ffbbba414ee003ce2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-tmdb/laravel/zipball/4fec330c81a62611d1abd895071d34bc405217c6",
-                "reference": "4fec330c81a62611d1abd895071d34bc405217c6",
+                "url": "https://api.github.com/repos/php-tmdb/laravel/zipball/12924a77d9ba631045e23b8ffbbba414ee003ce2",
+                "reference": "12924a77d9ba631045e23b8ffbbba414ee003ce2",
                 "shasum": ""
             },
             "require": {
@@ -1470,6 +1470,16 @@
                 "monolog/monolog": "Required if you want to make use of logging features."
             },
             "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Tmdb\\Laravel\\TmdbServiceProviderLaravel5"
+                    ],
+                    "aliases": {
+                        "Tmdb": "Tmdb\\Laravel\\Facades\\Tmdb"
+                    }
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Tmdb\\Laravel\\": "src/"
@@ -1497,7 +1507,7 @@
                 "tvdb",
                 "wrapper"
             ],
-            "time": "2015-12-23T14:25:18+00:00"
+            "time": "2017-09-07T21:45:05+00:00"
         },
         {
             "name": "psr/http-message",

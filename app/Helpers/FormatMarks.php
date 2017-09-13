@@ -24,12 +24,15 @@ class FormatMarks
         return array_slice($formattedArray,0,100,true);
     }
 
+
     public static function formatDislikeFromMultipleArrays($currentRecommendation, $similarDisliked, $dislikedMovie)
     {
         $formattedArray = [];
         foreach($currentRecommendation as $movieId => $mark) {
-            if(isset($similarDisliked[$movieId]) && $similarDisliked[$movieId]>2) {
-                continue;
+            if(isset($similarDisliked[$movieId]) && $similarDisliked[$movieId]>2.6) {
+                if($similarDisliked[$movieId] > $mark) {
+                    continue;
+                }
             }
             $formattedArray[$movieId] = $mark;
         }
@@ -45,7 +48,7 @@ class FormatMarks
     {
         $formattedArray = [];
         foreach($similarLiked as $movieId => $mark) {
-            if(isset($similarDisliked[$movieId]) && $similarDisliked[$movieId]>2) {
+            if(isset($similarDisliked[$movieId]) && $similarDisliked[$movieId] > 2.6) {
                 continue;
             }
             $formattedArray[$movieId] = $mark;

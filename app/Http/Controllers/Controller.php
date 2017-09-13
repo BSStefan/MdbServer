@@ -38,81 +38,11 @@ class Controller extends BaseController
             unlink($saved_image_uri);
         }
         catch(\Exception $e){
-            $fullName = 'No image';
+            $fullName = 'images/default.jpg';
         }
 
         return $fullName;
     }
 
-    ////public function userModelFirst(
-    ////    array $moviesArray
-    ////)
-    ////{
-    ////    $userCoefficientRepository = resolve(UserCoefficientRepository::class);
-    ////    $movieModelRepository = resolve(MovieModelRepository::class);
-    ////    $userRecommendationRepository = resolve(UserRecommendationRepository::class);
-    ////    $user  = JWTAuth::user();
-    ////    $coefficients = $userCoefficientRepository->findBy('user_id', $user->id);
-    ////    $otherMovies = $movieModelRepository->getNotInArray($moviesArray);
-    ////    $similarity = [];
-    ////    foreach($moviesArray as $movieId) {
-    ////        $movieModel = $movieModelRepository->findBy('movie_id',$movieId);
-    ////        $similarMovies = FindSimilarlyMovies::findSimilarMovies($movieModel, $otherMovies, $coefficients);
-    ////        $similarity[$movieId] = $similarMovies;
-    ////    }
-    ////
-    ////    $similarity = FormatMarks::formatFromMultipleArrays($similarity);
-    ////    $lastMovie = $movieModelRepository->findLast();
-    ////
-    ////    return $userRecommendationRepository->saveNewRecommendation($user->id, $similarity, $lastMovie->movie_id);
-    ////}
-    //
-    //
-    //
-    //
-    //
-    //
-    ////protected function likedMovieFindSimilar(
-    ////    $id,
-    ////    UserCoefficientRepository $userCoefficientRepository,
-    ////    MovieModelRepository $movieModelRepository,
-    ////    UserRecommendationRepository $userRecommendationRepository
-    ////)
-    ////{
-    ////    $user = JWTAuth::user();
-    ////    $movieModel = $movieModelRepository->findBy('movie_id', $id);
-    ////    $otherMovieModels = $movieModelRepository->getAllOthers($id);
-    ////    $coefficients = $userCoefficientRepository->findBy('user_id', $user->id);
-    ////    $similarMovies = $this->findSimilarMovies($movieModel, $otherMovieModels, $coefficients);
-    ////    $userRecommendation = $userRecommendationRepository->findBy('user_id', $user->id);
-    ////
-    ////    $newRecommendation = FormatMarks::formatFromMultipleArrays([$similarMovies,$userRecommendation->movies]);
-    ////
-    ////    $userRecommendationRepository->saveNewRecommendation($user->id, $newRecommendation, $userRecommendation->last_movie_calculated, $userRecommendation->id);
-    ////}
-    //
-    //protected function updateSimilar(
-    //    LikeDislikeRepository $likeDislikeRepository,
-    //    UserCoefficientRepository $userCoefficientRepository,
-    //    MovieModelRepository $movieModelRepository,
-    //    UserRecommendationRepository $userRecommendationRepository
-    //)
-    //{
-    //    $user = JWTAuth::user();
-    //    $likedMovies = $likeDislikeRepository->getAllLikes($user->id);
-    //    $coefficients = $userCoefficientRepository->findBy('user_id', $user->id);
-    //    $otherMovies = $movieModelRepository->getNotInArray($likedMovies);
-    //    $similarity = [];
-    //    foreach($likedMovies as $movieId) {
-    //        $movieModel = $movieModelRepository->findBy('movie_id',$movieId);
-    //        $similarMovies = $this->findSimilarMovies($movieModel, $otherMovies, $coefficients);
-    //        $similarity[$movieId] = $similarMovies;
-    //    }
-    //    $old = $userRecommendationRepository->findBy('user_id', $user->id);
-    //    $similarity = FormatMarks::formatFromMultipleArrays($similarity);
-    //    $lastMovie = $movieModelRepository->findLast();
-    //
-    //    $userRecommendationRepository->saveNewRecommendation($user->id, $similarity, $lastMovie->movie_id, $old->id);
-    //}
 }
 

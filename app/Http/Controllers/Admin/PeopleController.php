@@ -57,7 +57,6 @@ class PeopleController extends Controller
      */
     public function postPopularPeopleFromTmdb($page)
     {
-        //TODO image factory problem
         $people = $this->tmdbRepository->getPopularPeople($page);
 
         try{
